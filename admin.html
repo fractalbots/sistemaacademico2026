@@ -946,57 +946,14 @@ select.fi { cursor:pointer; }
               <th>Acciones</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar gold">LM</div><div><div class="cell-name">Lic. Laura Martínez</div><div class="cell-sub">Docente</div></div></div></td>
-              <td>Matemáticas</td>
-              <td style="font-size:0.78rem;color:var(--text3)">l.martinez [at] charlesbabbage.com</td>
-              <td><span class="badge badge-blue">8vo A</span> <span class="badge badge-blue">9no A</span></td>
-              <td><span class="badge badge-green">● Activo</span></td>
-              <td><div class="row-actions"><button class="action-btn view" title="Ver">👁️</button><button class="action-btn edit" title="Editar" onclick="openModal('modal-docente','Editar Docente')">✏️</button><button class="action-btn del" title="Eliminar">🗑️</button></div></td>
-            </tr>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar red">CG</div><div><div class="cell-name">Prof. Carlos González</div><div class="cell-sub">Docente</div></div></div></td>
-              <td>Lengua y Literatura</td>
-              <td style="font-size:0.78rem;color:var(--text3)">correo [at] charlesbabbage.com</td>
-              <td><span class="badge badge-blue">10mo A</span> <span class="badge badge-blue">1ro BGU</span></td>
-              <td><span class="badge badge-green">● Activo</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-docente','Editar Docente')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar dark">AR</div><div><div class="cell-name">Mg. Ana Rodríguez</div><div class="cell-sub">Docente</div></div></div></td>
-              <td>Ciencias Naturales</td>
-              <td style="font-size:0.78rem;color:var(--text3)">correo [at] charlesbabbage.com</td>
-              <td><span class="badge badge-blue">8vo B</span></td>
-              <td><span class="badge badge-gold">● Licencia</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-docente','Editar Docente')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar gold">JP</div><div><div class="cell-name">Lic. Jorge Pérez</div><div class="cell-sub">Docente</div></div></div></td>
-              <td>Historia y CCSS</td>
-              <td style="font-size:0.78rem;color:var(--text3)">correo [at] charlesbabbage.com</td>
-              <td><span class="badge badge-blue">2do BGU</span> <span class="badge badge-blue">3ro BGU</span></td>
-              <td><span class="badge badge-green">● Activo</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-docente','Editar Docente')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar red">MV</div><div><div class="cell-name">Ing. María Vásquez</div><div class="cell-sub">Docente STEAM</div></div></div></td>
-              <td>Robótica / Tecnología</td>
-              <td style="font-size:0.78rem;color:var(--text3)">correo [at] charlesbabbage.com</td>
-              <td><span class="badge badge-blue">Todos los niveles</span></td>
-              <td><span class="badge badge-green">● Activo</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-docente','Editar Docente')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
+          <tbody id="docentes-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">⏳ Cargando docentes...</td></tr>
           </tbody>
         </table>
       </div>
       <div class="table-footer">
-        <span>Mostrando 5 de 12 docentes</span>
-        <div class="pagination">
-          <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
-          <button class="page-btn">3</button>
-        </div>
+        <span id="docentes-footer">Cargando...</span>
+        <div class="pagination" id="docentes-pagination"></div>
       </div>
     </div>
   </div>
@@ -1036,57 +993,19 @@ select.fi { cursor:pointer; }
               <th>Acciones</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar red">VT</div><div><div class="cell-name">Valentina Torres</div><div class="cell-sub">Estudiante</div></div></div></td>
-              <td style="font-family:monospace;font-size:0.82rem">1750123456</td>
-              <td><span class="badge badge-blue">8vo "B"</span></td>
-              <td style="font-size:0.78rem;color:var(--text3)">María Torres — 0987654321</td>
-              <td><span class="badge badge-green">● Activa</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-estudiante','Editar Estudiante')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar gold">SC</div><div><div class="cell-name">Santiago Cárdenas</div><div class="cell-sub">Estudiante</div></div></div></td>
-              <td style="font-family:monospace;font-size:0.82rem">1720987654</td>
-              <td><span class="badge badge-blue">9no "A"</span></td>
-              <td style="font-size:0.78rem;color:var(--text3)">Luis Cárdenas — 0991234567</td>
-              <td><span class="badge badge-green">● Activo</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-estudiante','Editar Estudiante')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar dark">IR</div><div><div class="cell-name">Isabella Ramírez</div><div class="cell-sub">Estudiante</div></div></div></td>
-              <td style="font-family:monospace;font-size:0.82rem">1745678901</td>
-              <td><span class="badge badge-blue">1ro BGU</span></td>
-              <td style="font-size:0.78rem;color:var(--text3)">Carmen Ramírez — 0967891234</td>
-              <td><span class="badge badge-red">⚠️ Supletorio</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-estudiante','Editar Estudiante')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar red">DM</div><div><div class="cell-name">Diego Molina</div><div class="cell-sub">Estudiante</div></div></div></td>
-              <td style="font-family:monospace;font-size:0.82rem">1730456789</td>
-              <td><span class="badge badge-blue">2do BGU</span></td>
-              <td style="font-size:0.78rem;color:var(--text3)">Roberto Molina — 0978563412</td>
-              <td><span class="badge badge-green">● Activo</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-estudiante','Editar Estudiante')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
-            <tr>
-              <td><div class="avatar-cell"><div class="mini-avatar gold">AV</div><div><div class="cell-name">Ariana Vargas</div><div class="cell-sub">Estudiante</div></div></div></td>
-              <td style="font-family:monospace;font-size:0.82rem">1762345678</td>
-              <td><span class="badge badge-blue">3ro BGU</span></td>
-              <td style="font-size:0.78rem;color:var(--text3)">Paola Vargas — 0956781234</td>
-              <td><span class="badge badge-green">● Activa</span></td>
-              <td><div class="row-actions"><button class="action-btn view">👁️</button><button class="action-btn edit" onclick="openModal('modal-estudiante','Editar Estudiante')">✏️</button><button class="action-btn del">🗑️</button></div></td>
-            </tr>
+          <tbody id="estudiantes-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">⏳ Cargando estudiantes...</td></tr>
           </tbody>
         </table>
       </div>
       <div class="table-footer">
-        <span>Mostrando 5 de 100 estudiantes</span>
-        <div class="pagination">
-          <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
-          <button class="page-btn">…</button>
-          <button class="page-btn">10</button>
+        <span id="estudiantes-footer">Cargando...</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="filter-select" id="filter-curso" onchange="renderEstudiantes()">
+            <option value="">Todos los cursos</option>
+            <option>Octavo</option><option>Noveno</option><option>Décimo</option>
+            <option>Primero BGU</option><option>Segundo BGU</option><option>Tercero BGU</option>
+          </select>
         </div>
       </div>
     </div>
@@ -1679,7 +1598,109 @@ function renderGrades(){
 }
 renderGrades();
 
-function setTrimestre(n, btn){
+/* ══════════════════════════════════════════════
+   CARGA DE DATOS REALES DESDE SUPABASE
+══════════════════════════════════════════════ */
+let allDocentes = [];
+let allEstudiantes = [];
+const avatarColors = ['gold','red','dark'];
+function getColor(i){ return avatarColors[i % avatarColors.length]; }
+function getInitials(n,a){ return ((n||'')[0]||'').toUpperCase() + ((a||'')[0]||'').toUpperCase(); }
+
+async function loadDocentes() {
+  const { data, error } = await sb.from('profiles').select(`
+    id, nombres, apellidos, cedula,
+    user_roles(rol),
+    docente_materia_curso(materias(nombre), cursos(nombre))
+  `).order('apellidos');
+  if (error) return;
+  allDocentes = data.filter(p => p.user_roles?.some(r => r.rol === 'docente'));
+  renderDocentes();
+}
+
+function renderDocentes() {
+  const tbody = document.getElementById('docentes-tbody');
+  const footer = document.getElementById('docentes-footer');
+  if (!tbody) return;
+  const q = document.querySelector('#sec-docentes input')?.value?.toLowerCase() || '';
+  const filtered = allDocentes.filter(d =>
+    (d.nombres+' '+d.apellidos).toLowerCase().includes(q) || (d.cedula||'').includes(q)
+  );
+  tbody.innerHTML = filtered.map((d,i) => {
+    const initials = getInitials(d.nombres, d.apellidos);
+    const materias = [...new Set((d.docente_materia_curso||[]).map(x=>x.materias?.nombre).filter(Boolean))];
+    const cursos   = [...new Set((d.docente_materia_curso||[]).map(x=>x.cursos?.nombre).filter(Boolean))];
+    const isAdmin  = d.user_roles?.some(r => r.rol === 'admin');
+    return `<tr>
+      <td><div class="avatar-cell"><div class="mini-avatar ${getColor(i)}">${initials}</div>
+        <div><div class="cell-name">${d.apellidos} ${d.nombres}</div>
+        <div class="cell-sub">${isAdmin?'Docente · Admin':'Docente'}</div></div></div></td>
+      <td>${materias.slice(0,2).join(', ')}${materias.length>2?' +'.concat(materias.length-2):''}</td>
+      <td style="font-size:0.78rem;color:var(--text3)">${d.cedula}</td>
+      <td>${cursos.map(c=>`<span class="badge badge-blue">${c}</span>`).join(' ')||'—'}</td>
+      <td><span class="badge badge-green">● Activo</span></td>
+      <td><div class="row-actions">
+        <button class="action-btn view" onclick="alert('${d.nombres} ${d.apellidos}\\nCédula: ${d.cedula}\\nMaterias: ${materias.join(', ')}')">👁️</button>
+      </div></td></tr>`;
+  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">Sin resultados</td></tr>';
+  if (footer) footer.textContent = `Mostrando ${filtered.length} de ${allDocentes.length} docentes`;
+}
+
+async function loadEstudiantes() {
+  const { data, error } = await sb.from('estudiantes').select(`
+    id, profiles(nombres, apellidos, cedula), cursos(nombre)
+  `).order('id');
+  if (error) return;
+  allEstudiantes = data;
+  renderEstudiantes();
+}
+
+function renderEstudiantes() {
+  const tbody = document.getElementById('estudiantes-tbody');
+  const footer = document.getElementById('estudiantes-footer');
+  if (!tbody) return;
+  const cursoFiltro = document.getElementById('filter-curso')?.value || '';
+  const q = document.querySelector('#sec-estudiantes input')?.value?.toLowerCase() || '';
+  const filtered = allEstudiantes.filter(e => {
+    const nombre = ((e.profiles?.nombres||'')+' '+(e.profiles?.apellidos||'')).toLowerCase();
+    return (!cursoFiltro || e.cursos?.nombre === cursoFiltro) && (!q || nombre.includes(q) || (e.profiles?.cedula||'').includes(q));
+  });
+  tbody.innerHTML = filtered.map((e,i) => {
+    const p = e.profiles||{};
+    const initials = getInitials(p.nombres, p.apellidos);
+    return `<tr>
+      <td><div class="avatar-cell"><div class="mini-avatar ${getColor(i)}">${initials}</div>
+        <div><div class="cell-name">${p.apellidos||''} ${p.nombres||''}</div>
+        <div class="cell-sub">Estudiante</div></div></div></td>
+      <td style="font-family:monospace;font-size:0.82rem">${p.cedula||'—'}</td>
+      <td><span class="badge badge-blue">${e.cursos?.nombre||'—'}</span></td>
+      <td style="font-size:0.78rem;color:var(--text3)">—</td>
+      <td><span class="badge badge-green">● Activo</span></td>
+      <td><div class="row-actions"><button class="action-btn view">👁️</button></div></td></tr>`;
+  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">Sin resultados</td></tr>';
+  if (footer) footer.textContent = `Mostrando ${filtered.length} de ${allEstudiantes.length} estudiantes`;
+}
+
+async function loadDashboard() {
+  const [r1, r2, r3] = await Promise.all([
+    sb.from('estudiantes').select('*',{count:'exact',head:true}),
+    sb.from('user_roles').select('*',{count:'exact',head:true}).eq('rol','docente'),
+    sb.from('calificaciones').select('*',{count:'exact',head:true})
+  ]);
+  const stats = document.querySelectorAll('.stat-value');
+  if (stats[0]) stats[0].textContent = r1.count ?? 103;
+  if (stats[1]) stats[1].textContent = r2.count ?? 12;
+  if (stats[2]) stats[2].textContent = r3.count ?? 0;
+}
+
+// Inicializar
+Promise.all([loadDocentes(), loadEstudiantes(), loadDashboard()]);
+
+// Búsqueda en tiempo real
+setTimeout(() => {
+  document.querySelector('#sec-docentes input')?.addEventListener('input', renderDocentes);
+  document.querySelector('#sec-estudiantes input')?.addEventListener('input', renderEstudiantes);
+}, 500);(n, btn){
   currentTrimestre = n;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
