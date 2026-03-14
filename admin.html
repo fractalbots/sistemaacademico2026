@@ -1640,10 +1640,18 @@ function renderDocentes() {
       <td>${cursos.map(c=>`<span class="badge badge-blue">${c}</span>`).join(' ')||'—'}</td>
       <td><span class="badge badge-green">● Activo</span></td>
       <td><div class="row-actions">
-        <button class="action-btn view" onclick="alert('${d.nombres} ${d.apellidos}\\nCédula: ${d.cedula}\\nMaterias: ${materias.join(', ')}')">👁️</button>
+        <button class="action-btn view" onclick="verDocente('${d.id}')">👁️</button>
       </div></td></tr>`;
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">Sin resultados</td></tr>';
   if (footer) footer.textContent = `Mostrando ${filtered.length} de ${allDocentes.length} docentes`;
+}
+
+function verDocente(id) {
+  const d = allDocentes.find(x => x.id === id);
+  if (!d) return;
+  const materias = [...new Set((d.docente_materia_curso||[]).map(x=>x.materias?.nombre).filter(Boolean))];
+  const cursos   = [...new Set((d.docente_materia_curso||[]).map(x=>x.cursos?.nombre).filter(Boolean))];
+  alert(d.nombres + ' ' + d.apellidos + '\nCédula: ' + d.cedula + '\nMaterias: ' + materias.join(', ') + '\nCursos: ' + cursos.join(', '));
 }
 
 async function loadEstudiantes() {
