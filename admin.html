@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin — Charles Babbage</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -10,8 +11,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPA_URL = 'https://lesomndhkrihswsxmbom.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxlc29tbmRoa3JpaHN3c3htYm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzOTI5ODYsImV4cCI6MjA4ODk2ODk4Nn0.VDE12Q-sl_y5_l4_vYvC0Qxgom_p2U6Ywd6SpH2mfXk';
-const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+const SUPA_KEY = 'sb_publishable_ngRjQLb3DBNZ0Vy9TFm7FQ_bM7nujP3';
+const { createClient } = window.supabase;
+const sb = createClient(SUPA_URL, SUPA_KEY);
 
 // Protección de ruta: verificar sesión y rol admin
 (async function() {
