@@ -22,9 +22,14 @@
   --sw:264px;--th:62px;
 }
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+/* OVERLAY para cerrar sidebar en móvil */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;backdrop-filter:blur(2px)}
+.sidebar-overlay.open{display:block}
 
 /* ── SIDEBAR ── */
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:var(--dark);display:flex;flex-direction:column;z-index:100;box-shadow:4px 0 24px rgba(0,0,0,.2);transition:transform .3s}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:var(--dark);display:flex;flex-direction:column;z-index:100;box-shadow:4px 0 24px rgba(0,0,0,.2);transition:transform .3s;overflow-y:auto;overflow-x:hidden}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px}
 .sb-logo{display:flex;align-items:center;gap:11px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
 .sb-logo svg{width:36px;height:36px;flex-shrink:0}
 .sb-logo-text span{font-family:'Cinzel',serif;font-size:.54rem;letter-spacing:.16em;color:var(--gold2);text-transform:uppercase;opacity:.65;display:block}
@@ -55,7 +60,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .hamburger{display:none;background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--text2)}
 
 /* ── MAIN ── */
-.main{margin-left:var(--sw);margin-top:var(--th);height:calc(100vh - var(--th));overflow-y:auto;padding:24px 28px}
+.main{margin-left:var(--sw);margin-top:var(--th);height:calc(100vh - var(--th));overflow-y:auto;overflow-x:hidden;padding:24px 28px}
 .section{display:none;animation:fadeIn .28s ease}
 .section.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -200,17 +205,24 @@ select.form-input{cursor:pointer}
 
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
+  .sidebar{transform:translateX(-100%);overflow-y:auto}
   .sidebar.open{transform:translateX(0)}
-  .topbar,.main{left:0;margin-left:0}
+  .topbar{left:0;margin-left:0}
+  .main{margin-left:0;padding:16px}
   .hamburger{display:block}
   .stats-grid{grid-template-columns:1fr 1fr}
   .ctrl-grid{grid-template-columns:1fr}
   .news-grid{grid-template-columns:1fr}
+  .section-head{flex-direction:column;align-items:flex-start}
+  .act-bar{flex-wrap:wrap}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 }
 </style>
 </head>
 <body>
+
+<!-- OVERLAY móvil -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
@@ -259,7 +271,7 @@ select.form-input{cursor:pointer}
 <!-- TOPBAR -->
 <header class="topbar">
   <div class="tb-left">
-    <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
     <div>
       <div class="page-title" id="page-title">Dashboard</div>
       <div class="breadcrumb">Admin / <span id="bc-sub">Inicio</span></div>
@@ -519,6 +531,20 @@ document.getElementById('topbar-date').textContent =
 
 async function cerrarSesion(){ await sb.auth.signOut(); window.location.href='login.html'; }
 
+// ─── SIDEBAR MÓVIL ───
+function toggleSidebar(){
+  var sb = document.getElementById('sidebar');
+  var ov = document.getElementById('sidebar-overlay');
+  var isOpen = sb.classList.toggle('open');
+  ov.classList.toggle('open', isOpen);
+  document.body.style.overflow = isOpen && window.innerWidth < 768 ? 'hidden' : '';
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 function nav(id, el){
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
   document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
@@ -528,7 +554,7 @@ function nav(id, el){
   var T={dashboard:'Dashboard',docentes:'Docentes',estudiantes:'Estudiantes',calificaciones:'Calificaciones',supletorio:'Supletorio',control:'Control de Notas',noticias:'Noticias'};
   document.getElementById('page-title').textContent = T[id]||id;
   document.getElementById('bc-sub').textContent = T[id]||id;
-  if(window.innerWidth<768) document.getElementById('sidebar').classList.remove('open');
+  if(window.innerWidth < 768) closeSidebar();
 }
 
 async function loadAll(){
@@ -591,7 +617,13 @@ function renderDocentes(){
       '<div><div class="cell-name">'+d.apellidos+' '+d.nombres+'</div>'+
       '<div class="cell-sub">'+(isAdmin?'Docente · Admin':'Docente')+'</div></div></div></td>'+
       '<td style="font-family:monospace;font-size:.78rem">'+d.cedula+'</td>'+
-      '<td style="font-size:.78rem">'+mats.slice(0,3).join(', ')+(mats.length>3?' +'.concat(mats.length-3,'…'):'')+'</td>'+
+      '<td style="font-size:.78rem;max-width:200px">'+
+        (mats.length===0
+          ? '<span style="color:var(--text3)">—</span>'
+          : mats.slice(0,3).map(function(m){
+              return '<span class="badge b-gold" style="margin:2px 2px;white-space:normal;word-break:break-word;display:inline-block;text-align:left">'+m+'</span>';
+            }).join('')+(mats.length>3?'<span class="badge b-gray" style="margin:2px">+'.concat(mats.length-3,'</span>'):''  )
+        )+'</td>'+
       '<td>'+curs.slice(0,4).map(function(c){return '<span class="badge b-blue" style="margin:1px 2px">'+c+'</span>';}).join('')+(curs.length>4?'<span class="badge b-gray">+'.concat(curs.length-4,'</span>'):'')+'</td>'+
       '<td>'+renderToggleDocente(d.id, d.cedula)+'</td>'+
       '</tr>';
@@ -742,7 +774,7 @@ async function cargarNotas(){
   (rc.data||[]).forEach(function(n){ nm[n.estudiante_id+'-'+n.materia_id] = n; });
 
   var thead = '<tr><th>#</th><th style="min-width:140px">Estudiante</th>';
-  mats.forEach(function(m){ thead += '<th style="max-width:80px;font-size:.62rem">'+m.nombre+'</th>'; });
+  mats.forEach(function(m){ thead += '<th style="min-width:80px;max-width:120px;white-space:normal;word-break:break-word;font-size:.62rem;text-align:center">'+m.nombre+'</th>'; });
   thead += '<th>Promedio</th><th>Estado</th></tr>';
 
   var tbody = ests.map(function(e,i){
