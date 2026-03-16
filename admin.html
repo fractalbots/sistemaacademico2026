@@ -733,8 +733,8 @@ function renderDocentes(){
       '<td>'+curs.slice(0,4).map(function(c){return '<span class="badge b-blue" style="margin:1px 2px">'+c+'</span>';}).join('')+(curs.length>4?'<span class="badge b-gray">+'.concat(curs.length-4,'</span>'):'')+'</td>'+
       '<td>'+renderToggleDocente(d.id, d.cedula)+'</td>'+
       '<td><div style="display:flex;gap:5px">'+
-        '<button class="action-btn" onclick="abrirModalDocente(''+d.id+'')" title="Editar">✏️</button>'+
-        '<button class="action-btn del" onclick="pedirEliminarDocente(''+d.id+'',''+d.nombres+' '+d.apellidos+'')" title="Eliminar">🗑️</button>'+
+        '<button class="action-btn" onclick="abrirModalDocente(\''+d.id+'\')" title="Editar">✏️</button>'+
+        '<button class="action-btn del" onclick="pedirEliminarDocente(\''+d.id+'\',\''+((d.nombres||'')+' '+(d.apellidos||'')).replace(/'/g,'')+'\')" title="Eliminar">🗑️</button>'+
       '</div></td>'+
       '</tr>';
   }).join('');
@@ -809,7 +809,7 @@ function renderEstudiantes(){
       '</td>'+
       '<td><div style="display:flex;gap:5px">'+
         '<button class="action-btn" onclick="abrirModalEstudiante('+e.id+')" title="Editar">✏️</button>'+
-        '<button class="action-btn del" onclick="pedirEliminarEstudiante('+e.id+',\"'+((p.apellidos||'')+' '+(p.nombres||'')).replace(/"/g,'')+'\")"' + ' title="Eliminar">🗑️</button>'+
+        '<button class="action-btn del" onclick="pedirEliminarEstudiante('+e.id+',\''+((p.apellidos||'')+' '+(p.nombres||'')).replace(/'/g,'')+'\')" title="Eliminar">🗑️</button>'+
       '</div></td>'+
       '</tr>';
   }).join('');
