@@ -348,12 +348,13 @@ select.form-input{cursor:pointer}
           <span class="search-icon">🔍</span>
           <input type="text" id="search-doc" placeholder="Buscar docente..." oninput="renderDocentes()"/>
         </div>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalDocente()">➕ Nuevo Docente</button>
       </div>
     </div>
     <div class="table-wrap">
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Docente</th><th>Cédula</th><th>Materias</th><th>Cursos</th><th>Acceso</th></tr></thead>
+          <thead><tr><th>Docente</th><th>Cédula</th><th>Materias</th><th>Cursos</th><th>Acceso</th><th>Acciones</th></tr></thead>
           <tbody id="doc-tbody"><tr><td colspan="5" style="text-align:center;padding:28px;color:var(--text3)">⏳ Cargando...</td></tr></tbody>
         </table>
       </div>
@@ -375,12 +376,13 @@ select.form-input{cursor:pointer}
           <option>Octavo</option><option>Noveno</option><option>Décimo</option>
           <option>Primero BGU</option><option>Segundo BGU</option><option>Tercero BGU</option>
         </select>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalEstudiante()">➕ Nuevo Estudiante</button>
       </div>
     </div>
     <div class="table-wrap">
       <div class="table-scroll">
         <table>
-          <thead><tr><th>#</th><th>Estudiante</th><th>Cédula</th><th>Curso</th><th>Acceso al Sistema</th></tr></thead>
+          <thead><tr><th>#</th><th>Estudiante</th><th>Cédula</th><th>Curso</th><th>Acceso al Sistema</th><th>Acciones</th></tr></thead>
           <tbody id="est-tbody"><tr><td colspan="5" style="text-align:center;padding:28px;color:var(--text3)">⏳ Cargando...</td></tr></tbody>
         </table>
       </div>
@@ -488,6 +490,110 @@ select.form-input{cursor:pointer}
       </div>
     </div>
   </div>
+
+
+<!-- ══ MODAL DOCENTE ══ -->
+<div class="modal-overlay" id="modal-docente">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-doc-titulo">Nuevo Docente</h3>
+      <button class="modal-close" onclick="cerrarModalDocente()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="doc-edit-id"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label class="form-label">Nombres *</label>
+          <input type="text" class="form-input" id="doc-nombres" placeholder="Nombres completos"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Apellidos *</label>
+          <input type="text" class="form-input" id="doc-apellidos" placeholder="Apellidos completos"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">Cédula *</label>
+        <input type="text" class="form-input" id="doc-cedula" placeholder="Número de cédula" maxlength="10"/>
+      </div>
+      <div class="form-group" style="margin-top:12px" id="doc-pass-group">
+        <label class="form-label">Contraseña inicial *</label>
+        <input type="text" class="form-input" id="doc-pass" placeholder="Mínimo 6 caracteres"/>
+        <span style="font-size:.68rem;color:var(--text3);margin-top:4px;display:block">El docente usará su correo: cédula@charlesbabbage.edu.ec</span>
+      </div>
+      <div id="modal-doc-msg" style="display:none;margin-top:10px;padding:8px 12px;border-radius:8px;font-size:.78rem"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="cerrarModalDocente()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarDocente()" id="btn-guardar-doc">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ESTUDIANTE ══ -->
+<div class="modal-overlay" id="modal-estudiante">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-est-titulo">Nuevo Estudiante</h3>
+      <button class="modal-close" onclick="cerrarModalEstudiante()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="est-edit-id"/>
+      <input type="hidden" id="est-edit-user-id"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label class="form-label">Nombres *</label>
+          <input type="text" class="form-input" id="est-nombres" placeholder="Nombres completos"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Apellidos *</label>
+          <input type="text" class="form-input" id="est-apellidos" placeholder="Apellidos completos"/>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+        <div class="form-group">
+          <label class="form-label">Cédula *</label>
+          <input type="text" class="form-input" id="est-cedula" placeholder="Número de cédula" maxlength="10"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Curso *</label>
+          <select class="form-input" id="est-curso">
+            <option value="">Seleccionar curso...</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px" id="est-pass-group">
+        <label class="form-label">Contraseña inicial *</label>
+        <input type="text" class="form-input" id="est-pass" placeholder="Mínimo 6 caracteres"/>
+        <span style="font-size:.68rem;color:var(--text3);margin-top:4px;display:block">El estudiante usará su cédula como usuario</span>
+      </div>
+      <div id="modal-est-msg" style="display:none;margin-top:10px;padding:8px 12px;border-radius:8px;font-size:.78rem"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="cerrarModalEstudiante()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEstudiante()" id="btn-guardar-est">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CONFIRMAR ELIMINAR ══ -->
+<div class="modal-overlay" id="modal-eliminar">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head">
+      <h3>Confirmar eliminación</h3>
+      <button class="modal-close" onclick="cerrarModalEliminar()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="modal-del-msg" style="font-size:.85rem;color:var(--text2);line-height:1.6"></p>
+      <div style="margin-top:12px;padding:10px 14px;background:rgba(155,22,38,.06);border:1px solid rgba(155,22,38,.15);border-radius:8px;font-size:.76rem;color:var(--red2)">
+        ⚠️ Esta acción no se puede deshacer.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="cerrarModalEliminar()">Cancelar</button>
+      <button class="btn btn-danger" onclick="confirmarEliminar()" id="btn-confirmar-del" style="background:var(--red2);color:#fff">🗑️ Eliminar</button>
+    </div>
+  </div>
+</div>
 
 </main>
 
@@ -626,6 +732,10 @@ function renderDocentes(){
         )+'</td>'+
       '<td>'+curs.slice(0,4).map(function(c){return '<span class="badge b-blue" style="margin:1px 2px">'+c+'</span>';}).join('')+(curs.length>4?'<span class="badge b-gray">+'.concat(curs.length-4,'</span>'):'')+'</td>'+
       '<td>'+renderToggleDocente(d.id, d.cedula)+'</td>'+
+      '<td><div style="display:flex;gap:5px">'+
+        '<button class="action-btn" onclick="abrirModalDocente(''+d.id+'')" title="Editar">✏️</button>'+
+        '<button class="action-btn del" onclick="pedirEliminarDocente(''+d.id+'',''+d.nombres+' '+d.apellidos+'')" title="Eliminar">🗑️</button>'+
+      '</div></td>'+
       '</tr>';
   }).join('');
 }
@@ -697,6 +807,10 @@ function renderEstudiantes(){
       '<span class="tgl-label '+(activo?'on':'off')+'" id="elbl-'+e.id+'">'+(activo?'Activo':'Bloqueado')+'</span>'+
       '</div>'+
       '</td>'+
+      '<td><div style="display:flex;gap:5px">'+
+        '<button class="action-btn" onclick="abrirModalEstudiante('+e.id+')" title="Editar">✏️</button>'+
+        '<button class="action-btn del" onclick="pedirEliminarEstudiante('+e.id+',\"'+((p.apellidos||'')+' '+(p.nombres||'')).replace(/"/g,'')+'\")"' + ' title="Eliminar">🗑️</button>'+
+      '</div></td>'+
       '</tr>';
   }).join('');
 }
@@ -1046,6 +1160,249 @@ async function eliminarNoticia(id){
   await sb.from('noticias').update({activa:false}).eq('id',id);
   loadNoticias();
 }
+
+
+
+// ════════════════════════════════════════
+// CRUD DOCENTES
+// ════════════════════════════════════════
+
+var _deleteAction = null;
+
+function abrirModalDocente(userId){
+  var m = document.getElementById('modal-docente');
+  var msg = document.getElementById('modal-doc-msg');
+  msg.style.display='none';
+  if(userId){
+    // EDITAR
+    var d = docentes.find(function(x){return x.id===userId;});
+    if(!d) return;
+    document.getElementById('modal-doc-titulo').textContent = 'Editar Docente';
+    document.getElementById('doc-edit-id').value = userId;
+    document.getElementById('doc-nombres').value = d.nombres||'';
+    document.getElementById('doc-apellidos').value = d.apellidos||'';
+    document.getElementById('doc-cedula').value = d.cedula||'';
+    document.getElementById('doc-pass-group').style.display = 'none';
+  } else {
+    // NUEVO
+    document.getElementById('modal-doc-titulo').textContent = 'Nuevo Docente';
+    document.getElementById('doc-edit-id').value = '';
+    document.getElementById('doc-nombres').value = '';
+    document.getElementById('doc-apellidos').value = '';
+    document.getElementById('doc-cedula').value = '';
+    document.getElementById('doc-pass').value = '';
+    document.getElementById('doc-pass-group').style.display = 'block';
+  }
+  m.classList.add('open');
+}
+
+function cerrarModalDocente(){
+  document.getElementById('modal-docente').classList.remove('open');
+}
+
+function modalDocMsg(msg, ok){
+  var el = document.getElementById('modal-doc-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = ok ? 'rgba(22,163,74,.08)' : 'rgba(155,22,38,.08)';
+  el.style.border = ok ? '1px solid rgba(22,163,74,.2)' : '1px solid rgba(155,22,38,.2)';
+  el.style.color = ok ? 'var(--green)' : 'var(--red2)';
+}
+
+async function guardarDocente(){
+  var btn = document.getElementById('btn-guardar-doc');
+  var userId = document.getElementById('doc-edit-id').value;
+  var nombres = document.getElementById('doc-nombres').value.trim();
+  var apellidos = document.getElementById('doc-apellidos').value.trim();
+  var cedula = document.getElementById('doc-cedula').value.trim();
+
+  if(!nombres||!apellidos||!cedula){
+    modalDocMsg('Completa todos los campos obligatorios.', false); return;
+  }
+
+  btn.disabled=true; btn.textContent='⏳ Guardando...';
+
+  if(userId){
+    // ── EDITAR: actualizar solo el profile ──
+    var r = await sb.from('profiles').update({nombres:nombres,apellidos:apellidos,cedula:cedula}).eq('id',userId);
+    if(r.error){ modalDocMsg('Error: '+r.error.message, false); }
+    else { modalDocMsg('✅ Docente actualizado correctamente', true); await loadDocentes(); loadStats(); setTimeout(cerrarModalDocente,1200); }
+  } else {
+    // ── NUEVO: crear auth user + profile + rol ──
+    var pass = document.getElementById('doc-pass').value.trim();
+    if(!pass||pass.length<6){ modalDocMsg('La contraseña debe tener al menos 6 caracteres.', false); btn.disabled=false; btn.textContent='💾 Guardar'; return; }
+    var email = cedula+'@charlesbabbage.edu.ec';
+
+    // Usar la Edge Function para crear usuario (requiere service role)
+    var resp = await sb.functions.invoke('crear-usuario', {
+      body:{ email:email, password:pass, nombres:nombres, apellidos:apellidos, cedula:cedula, rol:'docente' }
+    });
+    if(resp.error){ modalDocMsg('Error: '+resp.error.message, false); }
+    else if(resp.data && resp.data.error){ modalDocMsg('Error: '+resp.data.error, false); }
+    else { modalDocMsg('✅ Docente creado correctamente', true); await loadDocentes(); loadStats(); setTimeout(cerrarModalDocente,1400); }
+  }
+
+  btn.disabled=false; btn.textContent='💾 Guardar';
+}
+
+function pedirEliminarDocente(userId, nombre){
+  document.getElementById('modal-del-msg').textContent =
+    '¿Eliminar al docente ' + nombre + '? Se eliminará su perfil y acceso al sistema.';
+  _deleteAction = async function(){
+    // Eliminar rol docente
+    await sb.from('user_roles').delete().eq('user_id',userId).eq('rol','docente');
+    // Eliminar asignaciones
+    await sb.from('docente_materia_curso').delete().eq('docente_id',userId);
+    // El profile se mantiene por si comparte datos — solo quitar rol
+    cerrarModalEliminar();
+    await loadDocentes(); loadStats();
+  };
+  document.getElementById('modal-eliminar').classList.add('open');
+}
+
+// ════════════════════════════════════════
+// CRUD ESTUDIANTES
+// ════════════════════════════════════════
+
+function abrirModalEstudiante(estId){
+  var m = document.getElementById('modal-estudiante');
+  var msg = document.getElementById('modal-est-msg');
+  msg.style.display='none';
+
+  // Poblar select de cursos
+  var sel = document.getElementById('est-curso');
+  sel.innerHTML = '<option value="">Seleccionar curso...</option>';
+  cursos.forEach(function(c){
+    sel.innerHTML += '<option value="'+c.id+'">'+c.nombre+'</option>';
+  });
+
+  if(estId){
+    // EDITAR
+    var e = estudiantes.find(function(x){return x.id===estId;});
+    if(!e) return;
+    var p = e.profiles||{};
+    document.getElementById('modal-est-titulo').textContent = 'Editar Estudiante';
+    document.getElementById('est-edit-id').value = estId;
+    document.getElementById('est-edit-user-id').value = p.id||'';
+    document.getElementById('est-nombres').value = p.nombres||'';
+    document.getElementById('est-apellidos').value = p.apellidos||'';
+    document.getElementById('est-cedula').value = p.cedula||'';
+    // Seleccionar curso actual
+    var cursoActual = cursos.find(function(x){return x.nombre===(e.cursos&&e.cursos.nombre);});
+    if(cursoActual) sel.value = cursoActual.id;
+    document.getElementById('est-pass-group').style.display = 'none';
+  } else {
+    // NUEVO
+    document.getElementById('modal-est-titulo').textContent = 'Nuevo Estudiante';
+    document.getElementById('est-edit-id').value = '';
+    document.getElementById('est-edit-user-id').value = '';
+    document.getElementById('est-nombres').value = '';
+    document.getElementById('est-apellidos').value = '';
+    document.getElementById('est-cedula').value = '';
+    document.getElementById('est-pass').value = '';
+    sel.value = '';
+    document.getElementById('est-pass-group').style.display = 'block';
+  }
+  m.classList.add('open');
+}
+
+function cerrarModalEstudiante(){
+  document.getElementById('modal-estudiante').classList.remove('open');
+}
+
+function modalEstMsg(msg, ok){
+  var el = document.getElementById('modal-est-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = ok ? 'rgba(22,163,74,.08)' : 'rgba(155,22,38,.08)';
+  el.style.border = ok ? '1px solid rgba(22,163,74,.2)' : '1px solid rgba(155,22,38,.2)';
+  el.style.color = ok ? 'var(--green)' : 'var(--red2)';
+}
+
+async function guardarEstudiante(){
+  var btn = document.getElementById('btn-guardar-est');
+  var estId = document.getElementById('est-edit-id').value;
+  var userId = document.getElementById('est-edit-user-id').value;
+  var nombres = document.getElementById('est-nombres').value.trim();
+  var apellidos = document.getElementById('est-apellidos').value.trim();
+  var cedula = document.getElementById('est-cedula').value.trim();
+  var cursoId = document.getElementById('est-curso').value;
+
+  if(!nombres||!apellidos||!cedula||!cursoId){
+    modalEstMsg('Completa todos los campos obligatorios.', false); return;
+  }
+
+  btn.disabled=true; btn.textContent='⏳ Guardando...';
+
+  if(estId){
+    // ── EDITAR: actualizar profile + curso ──
+    var r1 = await sb.from('profiles').update({nombres:nombres,apellidos:apellidos,cedula:cedula}).eq('id',userId);
+    var r2 = await sb.from('estudiantes').update({curso_id:parseInt(cursoId)}).eq('id',parseInt(estId));
+    if(r1.error||r2.error){
+      modalEstMsg('Error: '+((r1.error||r2.error).message), false);
+    } else {
+      modalEstMsg('✅ Estudiante actualizado correctamente', true);
+      await loadEstudiantes(); loadStats();
+      setTimeout(cerrarModalEstudiante,1200);
+    }
+  } else {
+    // ── NUEVO: crear auth user + profile + estudiante ──
+    var pass = document.getElementById('est-pass').value.trim();
+    if(!pass||pass.length<6){ modalEstMsg('La contraseña debe tener al menos 6 caracteres.', false); btn.disabled=false; btn.textContent='💾 Guardar'; return; }
+    var email = cedula+'@charlesbabbage.edu.ec';
+
+    var resp = await sb.functions.invoke('crear-usuario', {
+      body:{ email:email, password:pass, nombres:nombres, apellidos:apellidos, cedula:cedula, rol:'estudiante', curso_id:parseInt(cursoId) }
+    });
+    if(resp.error){ modalEstMsg('Error: '+resp.error.message, false); }
+    else if(resp.data && resp.data.error){ modalEstMsg('Error: '+resp.data.error, false); }
+    else { modalEstMsg('✅ Estudiante creado correctamente', true); await loadEstudiantes(); loadStats(); setTimeout(cerrarModalEstudiante,1400); }
+  }
+
+  btn.disabled=false; btn.textContent='💾 Guardar';
+}
+
+function pedirEliminarEstudiante(estId, nombre){
+  document.getElementById('modal-del-msg').textContent =
+    '¿Eliminar al estudiante ' + nombre + '? Se eliminará su registro y acceso al sistema.';
+  _deleteAction = async function(){
+    var e = estudiantes.find(function(x){return x.id===estId;});
+    if(e){
+      // Eliminar calificaciones del estudiante
+      await sb.from('calificaciones').delete().eq('estudiante_id',estId);
+      // Eliminar registro estudiante
+      await sb.from('estudiantes').delete().eq('id',estId);
+      // Eliminar rol
+      if(e.profiles&&e.profiles.id){
+        await sb.from('user_roles').delete().eq('user_id',e.profiles.id);
+      }
+    }
+    cerrarModalEliminar();
+    await loadEstudiantes(); loadStats();
+  };
+  document.getElementById('modal-eliminar').classList.add('open');
+}
+
+// ════════════════════════════════════════
+// MODAL ELIMINAR GENÉRICO
+// ════════════════════════════════════════
+
+function cerrarModalEliminar(){
+  document.getElementById('modal-eliminar').classList.remove('open');
+  _deleteAction = null;
+}
+
+async function confirmarEliminar(){
+  var btn = document.getElementById('btn-confirmar-del');
+  btn.disabled=true; btn.textContent='⏳ Eliminando...';
+  if(_deleteAction) await _deleteAction();
+  btn.disabled=false; btn.textContent='🗑️ Eliminar';
+}
+
+// Cerrar modales al hacer clic en overlay
+document.getElementById('modal-docente').addEventListener('click', function(e){ if(e.target===this) cerrarModalDocente(); });
+document.getElementById('modal-estudiante').addEventListener('click', function(e){ if(e.target===this) cerrarModalEstudiante(); });
+document.getElementById('modal-eliminar').addEventListener('click', function(e){ if(e.target===this) cerrarModalEliminar(); });
 
 // Init fecha
 document.getElementById('n-fecha').value = new Date().toISOString().split('T')[0];
