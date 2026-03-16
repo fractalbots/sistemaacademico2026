@@ -1282,7 +1282,7 @@ async function cargarAsignaciones(docenteId){
       '<div style="display:flex;gap:5px;align-items:center">'+
         '<span class="badge '+(activo?'b-green':'b-red')+'" style="font-size:.62rem">'+(activo?'Activa':'Inactiva')+'</span>'+
         (activo
-          ? '<button class="action-btn del" onclick="quitarAsignacion('+a.id+',''+m.nombre+' — '+cu.nombre+'')" title="Quitar">🗑️</button>'
+          ? '<button class="action-btn del" onclick="quitarAsignacion('+a.id+',\''+((m.nombre||'')+' — '+(cu.nombre||'')).replace(/'/g,'')+'\')" title="Quitar">🗑️</button>'
           : '<button class="action-btn" onclick="reactivarAsignacion('+a.id+')" title="Reactivar" style="font-size:.65rem;width:auto;padding:0 8px">↺ Activar</button>'
         )+
       '</div>'+
