@@ -348,7 +348,17 @@ select.form-input{cursor:pointer}
           <span class="search-icon">🔍</span>
           <input type="text" id="search-doc" placeholder="Buscar docente..." oninput="renderDocentes()"/>
         </div>
+        <button class="btn btn-outline btn-sm" onclick="toggleVistaDoc(this)">📋 Ver por materia</button>
         <button class="btn btn-primary btn-sm" onclick="abrirModalDocente()">➕ Nuevo Docente</button>
+      </div>
+    </div>
+    <!-- Vista por materia (oculta por defecto) -->
+    <div id="vista-por-materia" style="display:none;margin-bottom:18px">
+      <div class="card">
+        <div class="card-title">📚 Materias y sus docentes asignados</div>
+        <div id="mats-por-docente" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">
+          <div style="color:var(--text3);font-size:.82rem;padding:16px">Cargando...</div>
+        </div>
       </div>
     </div>
     <div class="table-wrap">
@@ -494,35 +504,71 @@ select.form-input{cursor:pointer}
 
 <!-- ══ MODAL DOCENTE ══ -->
 <div class="modal-overlay" id="modal-docente">
-  <div class="modal">
+  <div class="modal" style="max-width:560px">
     <div class="modal-head">
       <h3 id="modal-doc-titulo">Nuevo Docente</h3>
       <button class="modal-close" onclick="cerrarModalDocente()">✕</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="padding-top:0">
       <input type="hidden" id="doc-edit-id"/>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="form-group">
-          <label class="form-label">Nombres *</label>
-          <input type="text" class="form-input" id="doc-nombres" placeholder="Nombres completos"/>
+      <!-- Pestañas -->
+      <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px">
+        <button id="tab-datos-btn" onclick="switchTabDoc('datos')" style="padding:10px 18px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;color:var(--red2);border-bottom:2px solid var(--red2);cursor:pointer;margin-bottom:-1px">Datos</button>
+        <button id="tab-mats-btn" onclick="switchTabDoc('mats')" style="padding:10px 18px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-1px" id="tab-mats-btn">Materias asignadas</button>
+      </div>
+      <!-- TAB DATOS -->
+      <div id="tab-datos">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">Nombres *</label>
+            <input type="text" class="form-input" id="doc-nombres" placeholder="Nombres completos"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Apellidos *</label>
+            <input type="text" class="form-input" id="doc-apellidos" placeholder="Apellidos completos"/>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Apellidos *</label>
-          <input type="text" class="form-input" id="doc-apellidos" placeholder="Apellidos completos"/>
+        <div class="form-group" style="margin-top:12px">
+          <label class="form-label">Cédula *</label>
+          <input type="text" class="form-input" id="doc-cedula" placeholder="Número de cédula" maxlength="10"/>
+        </div>
+        <div class="form-group" style="margin-top:12px" id="doc-pass-group">
+          <label class="form-label">Contraseña inicial *</label>
+          <input type="text" class="form-input" id="doc-pass" placeholder="Mínimo 6 caracteres"/>
+          <span style="font-size:.68rem;color:var(--text3);margin-top:4px;display:block">El docente usará su correo: cédula@charlesbabbage.edu.ec</span>
         </div>
       </div>
-      <div class="form-group" style="margin-top:12px">
-        <label class="form-label">Cédula *</label>
-        <input type="text" class="form-input" id="doc-cedula" placeholder="Número de cédula" maxlength="10"/>
-      </div>
-      <div class="form-group" style="margin-top:12px" id="doc-pass-group">
-        <label class="form-label">Contraseña inicial *</label>
-        <input type="text" class="form-input" id="doc-pass" placeholder="Mínimo 6 caracteres"/>
-        <span style="font-size:.68rem;color:var(--text3);margin-top:4px;display:block">El docente usará su correo: cédula@charlesbabbage.edu.ec</span>
+      <!-- TAB MATERIAS -->
+      <div id="tab-mats" style="display:none">
+        <!-- Asignar nueva materia -->
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:.75rem;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">Agregar asignación</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div class="form-group">
+              <label class="form-label">Materia</label>
+              <select class="form-input" id="asig-materia">
+                <option value="">Seleccionar...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Curso</label>
+              <select class="form-input" id="asig-curso">
+                <option value="">Seleccionar...</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="asignarMateria()" style="width:100%">➕ Asignar materia al docente</button>
+          <div id="asig-msg" style="display:none;margin-top:8px;padding:6px 10px;border-radius:7px;font-size:.76rem"></div>
+        </div>
+        <!-- Lista de asignaciones actuales -->
+        <div style="font-size:.75rem;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Asignaciones actuales</div>
+        <div id="lista-asignaciones" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto">
+          <div style="color:var(--text3);font-size:.8rem;text-align:center;padding:16px">Cargando...</div>
+        </div>
       </div>
       <div id="modal-doc-msg" style="display:none;margin-top:10px;padding:8px 12px;border-radius:8px;font-size:.78rem"></div>
     </div>
-    <div class="modal-foot">
+    <div class="modal-foot" id="modal-doc-foot">
       <button class="btn btn-outline" onclick="cerrarModalDocente()">Cancelar</button>
       <button class="btn btn-primary" onclick="guardarDocente()" id="btn-guardar-doc">💾 Guardar</button>
     </div>
@@ -605,6 +651,7 @@ const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 var docentes = [];
 var estudiantes = [];
 var cursos = [];
+var materias = [];
 var ctrlNotas = [];
 var currentCurso = null;
 var currentTrim = 2;
@@ -664,7 +711,13 @@ function nav(id, el){
 }
 
 async function loadAll(){
-  await Promise.all([loadDocentes(),loadEstudiantes(),loadCursos(),loadControl(),loadNoticias(),loadStats()]);
+  await Promise.all([loadMaterias(),loadDocentes(),loadEstudiantes(),loadCursos(),loadControl(),loadNoticias(),loadStats()]);
+}
+
+// ─── MATERIAS ───
+async function loadMaterias(){
+  var r = await sb.from('materias').select('id,nombre,icono').order('nombre');
+  if(r.data) materias = r.data;
 }
 
 // ─── STATS ───
@@ -733,6 +786,7 @@ function renderDocentes(){
       '<td>'+curs.slice(0,4).map(function(c){return '<span class="badge b-blue" style="margin:1px 2px">'+c+'</span>';}).join('')+(curs.length>4?'<span class="badge b-gray">+'.concat(curs.length-4,'</span>'):'')+'</td>'+
       '<td>'+renderToggleDocente(d.id, d.cedula)+'</td>'+
       '<td><div style="display:flex;gap:5px">'+
+        '<button class="action-btn" onclick="abrirModalDocente(\''+d.id+'\',true)" title="Materias" style="font-size:.7rem;width:auto;padding:0 8px">📚 Materias</button>'+
         '<button class="action-btn" onclick="abrirModalDocente(\''+d.id+'\')" title="Editar">✏️</button>'+
         '<button class="action-btn del" onclick="pedirEliminarDocente(\''+d.id+'\',\''+((d.nombres||'')+' '+(d.apellidos||'')).replace(/'/g,'')+'\')" title="Eliminar">🗑️</button>'+
       '</div></td>'+
@@ -1163,18 +1217,215 @@ async function eliminarNoticia(id){
 
 
 
+
+// ════════════════════════════════════════
+// GESTIÓN DE MATERIAS / ASIGNACIONES
+// ════════════════════════════════════════
+
+var _currentDocenteId = null;
+
+// ─── Pestañas del modal docente ───
+function switchTabDoc(tab){
+  var isData = tab === 'datos';
+  document.getElementById('tab-datos').style.display = isData ? 'block' : 'none';
+  document.getElementById('tab-mats').style.display  = isData ? 'none'  : 'block';
+  document.getElementById('tab-datos-btn').style.color       = isData ? 'var(--red2)' : 'var(--text3)';
+  document.getElementById('tab-datos-btn').style.borderBottomColor = isData ? 'var(--red2)' : 'transparent';
+  document.getElementById('tab-datos-btn').style.fontWeight  = isData ? '600' : '500';
+  document.getElementById('tab-mats-btn').style.color        = isData ? 'var(--text3)' : 'var(--red2)';
+  document.getElementById('tab-mats-btn').style.borderBottomColor  = isData ? 'transparent' : 'var(--red2)';
+  document.getElementById('tab-mats-btn').style.fontWeight   = isData ? '500' : '600';
+  // Mostrar/ocultar botón guardar solo en pestaña datos
+  document.getElementById('btn-guardar-doc').style.display = isData ? 'inline-flex' : 'none';
+  if(!isData && _currentDocenteId) cargarAsignaciones(_currentDocenteId);
+}
+
+// ─── Cargar asignaciones del docente en el modal ───
+async function cargarAsignaciones(docenteId){
+  var lista = document.getElementById('lista-asignaciones');
+  lista.innerHTML = '<div style="color:var(--text3);font-size:.8rem;text-align:center;padding:16px">⏳ Cargando...</div>';
+
+  // Poblar dropdowns
+  var selMat = document.getElementById('asig-materia');
+  var selCur = document.getElementById('asig-curso');
+  selMat.innerHTML = '<option value="">Seleccionar materia...</option>';
+  selCur.innerHTML = '<option value="">Seleccionar curso...</option>';
+  materias.forEach(function(m){
+    selMat.innerHTML += '<option value="'+m.id+'">'+(m.icono||'📚')+' '+m.nombre+'</option>';
+  });
+  cursos.forEach(function(c){
+    selCur.innerHTML += '<option value="'+c.id+'">'+c.nombre+'</option>';
+  });
+
+  // Cargar asignaciones actuales
+  var r = await sb.from('docente_materia_curso')
+    .select('id,activo,materias(id,nombre,icono),cursos(id,nombre)')
+    .eq('docente_id', docenteId)
+    .order('id');
+
+  if(r.error || !r.data || !r.data.length){
+    lista.innerHTML = '<div style="color:var(--text3);font-size:.8rem;text-align:center;padding:16px">Sin materias asignadas aún</div>';
+    return;
+  }
+
+  lista.innerHTML = r.data.map(function(a){
+    var m = a.materias||{}; var cu = a.cursos||{};
+    var activo = a.activo !== false;
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:'+(activo?'var(--bg)':'rgba(155,22,38,.04)')+';border:1px solid var(--border);border-radius:8px">'+
+      '<div style="display:flex;align-items:center;gap:8px">'+
+        '<span style="font-size:1rem">'+(m.icono||'📚')+'</span>'+
+        '<div>'+
+          '<div style="font-size:.82rem;font-weight:500;color:var(--text)">'+m.nombre+'</div>'+
+          '<div style="font-size:.7rem;color:var(--text3)">'+cu.nombre+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:5px;align-items:center">'+
+        '<span class="badge '+(activo?'b-green':'b-red')+'" style="font-size:.62rem">'+(activo?'Activa':'Inactiva')+'</span>'+
+        (activo
+          ? '<button class="action-btn del" onclick="quitarAsignacion('+a.id+',''+m.nombre+' — '+cu.nombre+'')" title="Quitar">🗑️</button>'
+          : '<button class="action-btn" onclick="reactivarAsignacion('+a.id+')" title="Reactivar" style="font-size:.65rem;width:auto;padding:0 8px">↺ Activar</button>'
+        )+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+// ─── Asignar nueva materia ───
+async function asignarMateria(){
+  var docenteId = _currentDocenteId;
+  var materiaId = parseInt(document.getElementById('asig-materia').value);
+  var cursoId   = parseInt(document.getElementById('asig-curso').value);
+  var msg = document.getElementById('asig-msg');
+
+  if(!materiaId || !cursoId){
+    mostrarAsigMsg('Selecciona materia y curso.', false); return;
+  }
+
+  // Verificar si ya existe
+  var check = await sb.from('docente_materia_curso')
+    .select('id,activo')
+    .eq('docente_id', docenteId)
+    .eq('materia_id', materiaId)
+    .eq('curso_id', cursoId)
+    .single();
+
+  if(check.data){
+    if(check.data.activo){
+      mostrarAsigMsg('Esta asignación ya existe.', false); return;
+    } else {
+      // Reactivar la existente
+      await sb.from('docente_materia_curso').update({activo:true}).eq('id', check.data.id);
+      mostrarAsigMsg('✅ Asignación reactivada', true);
+      await cargarAsignaciones(docenteId);
+      await loadDocentes();
+      return;
+    }
+  }
+
+  var r = await sb.from('docente_materia_curso').insert({
+    docente_id: docenteId,
+    materia_id: materiaId,
+    curso_id:   cursoId,
+    activo: true
+  });
+
+  if(r.error){ mostrarAsigMsg('Error: '+r.error.message, false); return; }
+  mostrarAsigMsg('✅ Materia asignada correctamente', true);
+  await cargarAsignaciones(docenteId);
+  await loadDocentes();
+}
+
+// ─── Quitar asignación (marcar inactiva) ───
+async function quitarAsignacion(asigId, nombre){
+  if(!confirm('¿Quitar la asignación "'+nombre+'" de este docente?')) return;
+  var r = await sb.from('docente_materia_curso').update({activo:false}).eq('id', asigId);
+  if(r.error){ alert('Error: '+r.error.message); return; }
+  await cargarAsignaciones(_currentDocenteId);
+  await loadDocentes();
+}
+
+// ─── Reactivar asignación ───
+async function reactivarAsignacion(asigId){
+  var r = await sb.from('docente_materia_curso').update({activo:true}).eq('id', asigId);
+  if(r.error){ alert('Error: '+r.error.message); return; }
+  await cargarAsignaciones(_currentDocenteId);
+  await loadDocentes();
+}
+
+function mostrarAsigMsg(txt, ok){
+  var el = document.getElementById('asig-msg');
+  el.textContent = txt;
+  el.style.display = 'block';
+  el.style.background = ok ? 'rgba(22,163,74,.08)' : 'rgba(155,22,38,.08)';
+  el.style.border = ok ? '1px solid rgba(22,163,74,.2)' : '1px solid rgba(155,22,38,.2)';
+  el.style.color = ok ? 'var(--green)' : 'var(--red2)';
+  if(ok) setTimeout(function(){ el.style.display='none'; }, 2500);
+}
+
+// ─── Vista "Ver por materia" ───
+function toggleVistaDoc(btn){
+  var panel = document.getElementById('vista-por-materia');
+  var visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  btn.textContent = visible ? '📋 Ver por materia' : '✕ Cerrar vista';
+  if(!visible) renderVistaPorMateria();
+}
+
+async function renderVistaPorMateria(){
+  var cont = document.getElementById('mats-por-docente');
+  cont.innerHTML = '<div style="color:var(--text3);font-size:.82rem;padding:16px">⏳ Cargando...</div>';
+
+  var r = await sb.from('docente_materia_curso')
+    .select('activo,materias(id,nombre,icono),cursos(nombre),profiles(nombres,apellidos)')
+    .eq('activo', true)
+    .order('id');
+
+  if(r.error || !r.data || !r.data.length){
+    cont.innerHTML = '<div style="color:var(--text3);font-size:.82rem;padding:16px">Sin asignaciones activas</div>';
+    return;
+  }
+
+  // Agrupar por materia
+  var byMat = {};
+  r.data.forEach(function(a){
+    var m = a.materias||{}; if(!m.id) return;
+    if(!byMat[m.id]) byMat[m.id] = {nombre:m.nombre, icono:m.icono||'📚', items:[]};
+    var p = a.profiles||{};
+    var docNombre = (p.apellidos||'')+' '+(p.nombres||'');
+    var curNombre = a.cursos ? a.cursos.nombre : '—';
+    byMat[m.id].items.push({docente:docNombre, curso:curNombre});
+  });
+
+  cont.innerHTML = Object.values(byMat).map(function(m){
+    return '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+        '<span style="font-size:1.2rem">'+m.icono+'</span>'+
+        '<span style="font-weight:600;font-size:.85rem;color:var(--text)">'+m.nombre+'</span>'+
+      '</div>'+
+      m.items.map(function(x){
+        return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:.78rem">'+
+          '<span style="color:var(--text2)">'+x.docente+'</span>'+
+          '<span class="badge b-blue">'+x.curso+'</span>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }).join('');
+}
+
 // ════════════════════════════════════════
 // CRUD DOCENTES
 // ════════════════════════════════════════
 
 var _deleteAction = null;
 
-function abrirModalDocente(userId){
+function abrirModalDocente(userId, abrirEnMaterias){
   var m = document.getElementById('modal-docente');
   var msg = document.getElementById('modal-doc-msg');
   msg.style.display='none';
+  document.getElementById('asig-msg').style.display='none';
+  _currentDocenteId = userId || null;
+
   if(userId){
-    // EDITAR
     var d = docentes.find(function(x){return x.id===userId;});
     if(!d) return;
     document.getElementById('modal-doc-titulo').textContent = 'Editar Docente';
@@ -1183,8 +1434,10 @@ function abrirModalDocente(userId){
     document.getElementById('doc-apellidos').value = d.apellidos||'';
     document.getElementById('doc-cedula').value = d.cedula||'';
     document.getElementById('doc-pass-group').style.display = 'none';
+    // Habilitar pestaña materias solo en edición
+    document.getElementById('tab-mats-btn').style.opacity = '1';
+    document.getElementById('tab-mats-btn').disabled = false;
   } else {
-    // NUEVO
     document.getElementById('modal-doc-titulo').textContent = 'Nuevo Docente';
     document.getElementById('doc-edit-id').value = '';
     document.getElementById('doc-nombres').value = '';
@@ -1192,7 +1445,13 @@ function abrirModalDocente(userId){
     document.getElementById('doc-cedula').value = '';
     document.getElementById('doc-pass').value = '';
     document.getElementById('doc-pass-group').style.display = 'block';
+    // Deshabilitar pestaña materias en creación nueva
+    document.getElementById('tab-mats-btn').style.opacity = '0.4';
+    document.getElementById('tab-mats-btn').disabled = true;
   }
+
+  // Arrancar siempre en pestaña datos, salvo que se pida materias
+  switchTabDoc(abrirEnMaterias && userId ? 'mats' : 'datos');
   m.classList.add('open');
 }
 
