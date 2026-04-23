@@ -1,11 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="refresh" content="0; url=login.html"/>
-<title>Sistema Académico — Charles Babbage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sistema Académico – Charles Babbage</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0f1e; --surface: #111827; --border: rgba(99,179,237,0.15);
+    --accent: #63b3ed; --accent2: #f6ad55; --text: #e2e8f0; --muted: #718096;
+  }
+  body {
+    font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; overflow: hidden; position: relative;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(99,179,237,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,179,237,0.04) 1px, transparent 1px);
+    background-size: 40px 40px; z-index: 0;
+  }
+  .blob { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.12; z-index: 0; animation: float 8s ease-in-out infinite; }
+  .blob-1 { width: 400px; height: 400px; background: #63b3ed; top: -100px; left: -100px; }
+  .blob-2 { width: 300px; height: 300px; background: #f6ad55; bottom: -80px; right: -80px; animation-delay: 3s; }
+  @keyframes float { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(20px,20px) scale(1.05)} }
+  .container {
+    position: relative; z-index: 1; text-align: center; max-width: 620px;
+    padding: 48px 32px; background: rgba(17,24,39,0.85); border: 1px solid var(--border);
+    border-radius: 20px; backdrop-filter: blur(16px); animation: fadeUp 0.8s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  .school-name { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--accent); text-transform:uppercase; opacity:0.8; margin-bottom:20px; display:block; }
+  .icon-wrap {
+    width:80px; height:80px; border-radius:50%; border:2px solid var(--border);
+    background:rgba(99,179,237,0.06); display:flex; align-items:center; justify-content:center;
+    margin:0 auto 20px; animation:pulse-ring 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse-ring { 0%,100%{box-shadow:0 0 0 0 rgba(99,179,237,0.3)} 50%{box-shadow:0 0 0 14px rgba(99,179,237,0)} }
+  .icon-wrap svg { width:36px; height:36px; color:var(--accent); }
+  h1 { font-size:28px; font-weight:800; color:#fff; margin-bottom:10px; }
+  .subtitle { font-size:15px; color:var(--muted); line-height:1.6; margin-bottom:32px; }
+  .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:28px; }
+  .status-item {
+    background:rgba(255,255,255,0.03); border:1px solid var(--border);
+    border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px; text-align:left;
+  }
+  .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; animation:blink 2s step-end infinite; }
+  .dot-red { background:#fc8181; box-shadow:0 0 6px #fc8181; }
+  .dot-yellow { background:var(--accent2); box-shadow:0 0 6px var(--accent2); animation-delay:0.5s; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .status-label { font-size:12px; color:var(--muted); display:block; }
+  .status-val { font-size:13px; font-weight:600; color:var(--text); }
+  .divider { border:none; border-top:1px solid var(--border); margin:4px 0 20px; }
+  .eta { font-size:13px; color:var(--muted); padding:10px 16px; background:rgba(246,173,85,0.06); border:1px solid rgba(246,173,85,0.2); border-radius:8px; margin-bottom:24px; }
+  .eta strong { color:var(--accent2); }
+  .contact { font-size:12px; color:var(--muted); font-family:'Space Mono',monospace; }
+  .contact a { color:var(--accent); text-decoration:none; }
+  .progress-bar { height:3px; background:rgba(99,179,237,0.1); border-radius:99px; margin-bottom:28px; overflow:hidden; }
+  .progress-fill { height:100%; width:65%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; animation:prog 3s ease-in-out infinite alternate; }
+  @keyframes prog { from{width:55%} to{width:75%} }
+</style>
 </head>
 <body>
-<script>window.location.replace('login.html');</script>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="container">
+  <span class="school-name">Unidad Educativa Charles Babbage</span>
+  <div class="icon-wrap">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l5.653-4.655m5.8-5.8 1.875-1.875a2.625 2.625 0 1 0-3.712-3.712L8.687 8.888M5.25 14.25l1.875-1.875"/>
+    </svg>
+  </div>
+  <h1>Sistema en Mantenimiento</h1>
+  <p class="subtitle">Estamos resolviendo un problema con los servicios de infraestructura.<br/>Volveremos pronto — gracias por tu paciencia.</p>
+  <div class="status-grid">
+    <div class="status-item">
+      <div class="dot dot-red"></div>
+      <div><span class="status-label">Hosting (Vercel)</span><span class="status-val">Suspendido</span></div>
+    </div>
+    <div class="status-item">
+      <div class="dot dot-red"></div>
+      <div><span class="status-label">Base de datos (Supabase)</span><span class="status-val">Suspendido</span></div>
+    </div>
+    <div class="status-item" style="grid-column:span 2">
+      <div class="dot dot-yellow"></div>
+      <div><span class="status-label">Estado general del sistema</span><span class="status-val">Restauración en proceso…</span></div>
+    </div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill"></div></div>
+  <div class="eta">⏱ Tiempo estimado de restauración: <strong>Próximas 24–48 horas</strong></div>
+  <hr class="divider"/>
+  <p class="contact">¿Necesitas acceder urgente? Contacta al administrador:<br/>
+    <a href="mailto:admin@charlesbabbage.edu.ec">admin@charlesbabbage.edu.ec</a>
+  </p>
+</div>
 </body>
 </html>
