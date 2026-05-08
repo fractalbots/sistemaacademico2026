@@ -397,8 +397,13 @@ async function cerrarSesion(){ await sb.auth.signOut(); window.location.href='lo
 // ─── CARGAR PERFIL ───
 async function cargarPerfil(userId){
   var rp = await sb.from('profiles').select('nombres,apellidos,cedula').eq('id',userId).single();
-  var re = await sb.from('estudiantes').select('id,cursos(id,nombre)').eq('user_id',userId).single();
+var re = await sb.from('estudiantes').select('id,activo,cursos(id,nombre)').eq('user_id',userId).single();
 
+if(!re.data || re.data.activo === false){
+    await sb.auth.signOut();
+    window.location.href='login.html';
+    return;
+}
   if(rp.data){
     var p = rp.data;
     var fullName = p.apellidos + ' ' + p.nombres;
