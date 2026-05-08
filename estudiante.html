@@ -125,6 +125,8 @@ table.main-table tbody td{padding:0;vertical-align:middle}
 .expand-arrow{font-size:.75rem;color:var(--text3);margin-left:auto;transition:transform .25s;padding-right:8px}
 .materia-row.expanded .expand-arrow{transform:rotate(90deg)}
 
+  
+
 /* trim score */
 .trim-cell{text-align:center;padding:14px 10px!important;vertical-align:middle!important}
 .trim-score{display:inline-flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;border-radius:10px;min-width:68px;cursor:pointer;transition:all .2s;border:1px solid transparent}
@@ -218,6 +220,7 @@ table.main-table tbody td{padding:0;vertical-align:middle}
   .section-header{flex-direction:column;align-items:flex-start}
   .legend-bar{gap:10px}
 }
+  .sidebar, .topbar, .main { visibility: hidden; }
 </style>
 </head>
 <body>
@@ -405,6 +408,10 @@ if(!re.data || re.data.activo === false){
     window.location.href='login.html';
     return;
 }
+
+  document.querySelectorAll('.sidebar,.topbar,.main').forEach(function(el){
+    el.style.visibility = 'visible';
+});
   if(rp.data){
     var p = rp.data;
     var fullName = p.apellidos + ' ' + p.nombres;
