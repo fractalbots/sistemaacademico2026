@@ -476,13 +476,14 @@ async function cargarCalificaciones(){
 
   var aprobadas = 0, supletorio = 0, sinNota = 0, promedioSum = 0, promedioCount = 0;
   materiasData.forEach(function(md, idx){
-    var n2 = md.notas[2];
-    if(!n2 || n2.total_parcial===null || n2.total_parcial===undefined){
+    var t1=calcTotal(md.notas[1]), t2=calcTotal(md.notas[2]), t3=calcTotal(md.notas[3]);
+    var disp=[t1,t2,t3].filter(function(v){return v!==null;});
+    if(!disp.length){
       sinNota++;
     } else {
-      var t = parseFloat(n2.total_parcial);
-      promedioSum += t; promedioCount++;
-      if(t >= 7) aprobadas++; else supletorio++;
+      var prom = disp.reduce(function(a,b){return a+b;},0)/disp.length;
+      promedioSum += prom; promedioCount++;
+      if(prom >= 7) aprobadas++; else supletorio++;
     }
     // Asignar icono y color si no tiene
     md.materia.icono = md.materia.icono || icons[idx % icons.length];
@@ -522,8 +523,9 @@ function renderQuickSummary(){
     return;
   }
   cont.innerHTML = materiasData.map(function(md){
-    var n2 = md.notas[2];
-    var t = calcTotal(n2);
+    var t1=calcTotal(md.notas[1]), t2=calcTotal(md.notas[2]), t3=calcTotal(md.notas[3]);
+    var disp=[t1,t2,t3].filter(function(v){return v!==null;});
+    var t = disp.length ? +(disp.reduce(function(a,b){return a+b;},0)/disp.length).toFixed(2) : null;
     var cls = scoreClass(t);
     var clrMap = {pass:'rgba(22,163,74,.08)',sup:'rgba(217,119,6,.08)',empty:'rgba(100,100,120,.06)'};
     var borderMap = {pass:'rgba(22,163,74,.2)',sup:'rgba(217,119,6,.2)',empty:'rgba(100,100,120,.15)'};
@@ -602,7 +604,7 @@ function trimScoreHTML(val, label){
   var cls = scoreClass(val);
   return '<div class="trim-score '+cls+'">'+
     '<div class="ts-num">'+val.toFixed(2)+'</div>'+
-    '<div class="ts-lbl">'+(cls==='pass'?'✓ ':'⚠ ')+label+'</div>'+
+    '<div class="ts-lbl">'+label+'</div>'+
     '</div>';
 }
 
