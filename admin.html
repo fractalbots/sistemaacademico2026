@@ -260,6 +260,7 @@ select.form-input{cursor:pointer}
   <div class="nav-group">
     <div class="nav-label">Académico</div>
     <div class="nav-item" onclick="nav('calificaciones',this)"><span class="ni">📊</span> Calificaciones</div>
+    <div class="nav-item" onclick="nav('sabana',this)"><span class="ni">📋</span> Sábana Anual</div>
     <div class="nav-item" onclick="nav('supletorio',this)"><span class="ni">⚠️</span> Supletorio</div>
     <div class="nav-item" onclick="nav('control',this)"><span class="ni">🔒</span> Control de Notas</div>
   </div>
@@ -415,17 +416,50 @@ select.form-input{cursor:pointer}
     <div id="notas-container"><div style="text-align:center;padding:32px;color:var(--text3)">Selecciona un curso para ver las notas</div></div>
   </div>
 
+  <!-- ══ SÁBANA ANUAL ══ -->
+  <style>
+    .sab-wrap{background:var(--white);border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+    .sab-scroll{overflow:auto;max-height:68vh}
+    table.sabana{border-collapse:separate;border-spacing:0;width:100%;font-size:.74rem}
+    table.sabana th,table.sabana td{padding:5px 6px;text-align:center;white-space:nowrap;border-right:1px solid var(--border);border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums}
+    table.sabana thead th{position:sticky;top:0;z-index:3;background:var(--bg)}
+    table.sabana thead tr.mat-grp th{top:0;z-index:4;background:var(--dark);color:#fff;border-color:#33334d;font-family:'Cinzel',serif;font-size:.66rem;letter-spacing:.04em}
+    table.sabana thead tr.mat-sub th{top:26px;z-index:3;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)}
+    table.sabana .col-est{position:sticky;left:0;z-index:2;background:var(--white);text-align:left;min-width:200px;border-right:2px solid var(--border)}
+    table.sabana thead .col-est{z-index:5;background:var(--dark);color:#fff}
+    table.sabana tbody tr:nth-child(even) td,table.sabana tbody tr:nth-child(even) .col-est{background:#faf9f7}
+    table.sabana tbody tr:hover td,table.sabana tbody tr:hover .col-est{background:rgba(184,146,42,.07)}
+    table.sabana td.prom{font-weight:700;font-family:'Cinzel',serif}
+    table.sabana td.c-sup{background:rgba(217,119,6,.1)}
+    table.sabana td.c-fail{background:rgba(155,22,38,.08)}
+    table.sabana td.suplfree{padding:2px;background:#fffdf7}
+    table.sabana td.suplfree input{width:42px;border:1px dashed var(--gold2);border-radius:5px;padding:3px 1px;text-align:center;font-size:.74rem;font-family:'DM Sans',sans-serif;background:#fff}
+    table.sabana td.suplfree input:focus{outline:none;border-style:solid;border-color:var(--gold)}
+    table.sabana .col-res{background:#f3f1ec;font-weight:700}
+    .sab-legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:0 0 14px;font-size:.72rem;color:var(--text3)}
+    .sab-legend .sw{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:-1px;margin-right:5px;border:1px solid var(--border)}
+    .sw-sup{background:rgba(217,119,6,.25)} .sw-fail{background:rgba(155,22,38,.2)} .sw-pass{background:rgba(22,163,74,.18)}
+  </style>
+  <div class="section" id="sec-sabana">
+    <div class="section-head">
+      <div><h2>Sábana Anual</h2><p>Los tres trimestres + promedio anual por materia · el supletorio se calcula del promedio de los tres</p></div>
+      <button class="btn btn-gold btn-sm" onclick="exportarSabanaPDF()">📄 Exportar PDF (promedios)</button>
+    </div>
+    <div class="curso-btns" id="sabana-curso-btns">⏳ Cargando cursos...</div>
+    <div class="sab-legend">
+      <span><span class="sw sw-pass"></span>Aprobado (≥7)</span>
+      <span><span class="sw sw-sup"></span>Supletorio (≥5 y &lt;7)</span>
+      <span><span class="sw sw-fail"></span>Reprobado (&lt;5)</span>
+      <span>· <b>Supl.</b> = casilla libre para anotar la nota del supletorio (no se guarda en la base)</span>
+      <span>· <span class="badge b-gray" style="font-size:.6rem">n/3</span> promedio provisional (faltan trimestres)</span>
+    </div>
+    <div id="sabana-container"><div style="text-align:center;padding:32px;color:var(--text3)">Selecciona un curso para ver la sábana</div></div>
+  </div>
+
   <!-- ══ SUPLETORIO ══ -->
   <div class="section" id="sec-supletorio">
     <div class="section-head">
-      <div><h2>Resumen de Supletorio</h2><p>Estudiantes con nota menor a 7.00 — Trimestre activo</p></div>
-      <div class="act-bar">
-        <div class="grade-tabs" style="margin:0">
-          <button class="grade-tab" onclick="selTrimSup(1,this)">T1</button>
-          <button class="grade-tab active" onclick="selTrimSup(2,this)">T2</button>
-          <button class="grade-tab" onclick="selTrimSup(3,this)">T3</button>
-        </div>
-      </div>
+      <div><h2>Resumen de Supletorio</h2><p>Promedio anual (de los tres trimestres) menor a 7.00 · agrupado por curso</p></div>
     </div>
     <div class="sup-grid" id="sup-grid"><div style="text-align:center;padding:32px;color:var(--text3)">⏳ Cargando...</div></div>
   </div>
@@ -656,6 +690,10 @@ var ctrlNotas = [];
 var currentCurso = null;
 var currentTrim = 2;
 var currentTrimSup = 2;
+var currentCursoSabana = null;
+var sabanaCargada = false;
+var supletorioCargado = false;
+var sabanaSupl = {}; // notas de supletorio escritas a mano: "estId-matId" -> texto
 var clrs = ['av-r','av-g','av-d'];
 function clr(i){ return clrs[i%3]; }
 function ini(n,a){ return ((n||'')[0]||'').toUpperCase() + ((a||'')[0]||'').toUpperCase(); }
@@ -704,7 +742,9 @@ function nav(id, el){
   var sec = document.getElementById('sec-'+id);
   if(sec) sec.classList.add('active');
   if(el) el.classList.add('active');
-  var T={dashboard:'Dashboard',docentes:'Docentes',estudiantes:'Estudiantes',calificaciones:'Calificaciones',supletorio:'Supletorio',control:'Control de Notas',noticias:'Noticias'};
+  var T={dashboard:'Dashboard',docentes:'Docentes',estudiantes:'Estudiantes',calificaciones:'Calificaciones',sabana:'Sábana Anual',supletorio:'Supletorio',control:'Control de Notas',noticias:'Noticias'};
+  if(id==='sabana' && !sabanaCargada){ sabanaCargada=true; loadSabanaCursos(); }
+  if(id==='supletorio' && !supletorioCargado){ supletorioCargado=true; loadSupletorio(); }
   document.getElementById('page-title').textContent = T[id]||id;
   document.getElementById('bc-sub').textContent = T[id]||id;
   if(window.innerWidth < 768) closeSidebar();
@@ -1009,71 +1049,252 @@ function exportarNotasPDF(){
   doc.save('calificaciones_'+currentCurso.nombre.replace(/ /g,'_')+'_T'+currentTrim+'.pdf');
 }
 
-// ─── SUPLETORIO ───
-function selTrimSup(t, btn){
-  currentTrimSup = t;
-  document.querySelectorAll('#sec-supletorio .grade-tab').forEach(function(b){b.classList.remove('active');});
-  if(btn) btn.classList.add('active');
-  loadSupletorio();
+// ─── SÁBANA ANUAL ───
+// Trae TODAS las calificaciones paginando (Supabase corta en 1000 por defecto)
+async function fetchCalifPaginado(selectStr, cursoId){
+  var todo = [], desde = 0, lote = 1000;
+  while(true){
+    var q = sb.from('calificaciones').select(selectStr);
+    if(cursoId) q = q.eq('curso_id', cursoId);
+    var r = await q.range(desde, desde+lote-1);
+    if(r.error) return {error:r.error};
+    var data = r.data||[];
+    todo = todo.concat(data);
+    if(data.length < lote) break;
+    desde += lote;
+    if(desde > 20000) break; // tope de seguridad
+  }
+  return {data:todo};
 }
 
+// promedio de los trimestres que existan; null si no hay ninguno
+function promArr(arr){
+  var v = arr.filter(function(x){return x!==null && x!==undefined;});
+  if(!v.length) return {prom:null, n:0};
+  return {prom: Math.round((v.reduce(function(a,b){return a+b;},0)/v.length)*100)/100, n:v.length};
+}
+function bandClass(p){ return p===null?'':(p>=7?'gv-pass':p>=5?'gv-sup':'gv-fail'); }
+
+async function loadSabanaCursos(){
+  var cont = document.getElementById('sabana-curso-btns');
+  var lista = cursos.length ? cursos : ((await sb.from('cursos').select('id,nombre').order('orden')).data||[]);
+  cursos = lista;
+  if(!lista.length){ cont.innerHTML='<span style="color:var(--text3)">Sin cursos</span>'; return; }
+  cont.innerHTML = lista.map(function(c){
+    return '<button class="curso-btn" onclick="selCursoSabana('+c.id+',\''+c.nombre.replace(/'/g,"\\'")+'\',this)">'+c.nombre+'</button>';
+  }).join('');
+  var fb = cont.querySelector('.curso-btn');
+  selCursoSabana(lista[0].id, lista[0].nombre, fb);
+}
+
+function selCursoSabana(id, nombre, btn){
+  currentCursoSabana = {id:id, nombre:nombre};
+  document.querySelectorAll('#sabana-curso-btns .curso-btn').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  cargarSabana();
+}
+
+async function cargarSabana(){
+  var cont = document.getElementById('sabana-container');
+  if(!currentCursoSabana) return;
+  cont.innerHTML = '<div style="text-align:center;padding:28px;color:var(--text3)">⏳ Cargando sábana...</div>';
+
+  var re = await sb.from('estudiantes').select('id,profiles(nombres,apellidos)').eq('curso_id',currentCursoSabana.id).order('id');
+  var ests = re.data||[];
+  if(!ests.length){ cont.innerHTML='<div style="text-align:center;padding:28px;color:var(--text3)">Sin estudiantes en este curso</div>'; return; }
+
+  var rc = await fetchCalifPaginado('estudiante_id,materia_id,trimestre,total_parcial,materias(nombre)', currentCursoSabana.id);
+  if(rc.error){ cont.innerHTML='<div style="text-align:center;padding:28px;color:var(--red)">Error: '+rc.error.message+'</div>'; return; }
+
+  // notas de supletorio ya guardadas para este curso
+  var rs = await sb.from('supletorios').select('estudiante_id,materia_id,nota').eq('curso_id',currentCursoSabana.id);
+  (rs.data||[]).forEach(function(s){ sabanaSupl[s.estudiante_id+'-'+s.materia_id] = (s.nota===null?'':String(s.nota)); });
+
+  // materias presentes (las que tienen notas en este curso)
+  var matMap = {};
+  rc.data.forEach(function(n){ if(n.materia_id!=null) matMap[n.materia_id] = n.materias?n.materias.nombre:('Materia '+n.materia_id); });
+  var mats = Object.keys(matMap).map(function(id){return {id:id, nombre:matMap[id]};})
+                  .sort(function(a,b){return a.nombre.localeCompare(b.nombre,'es');});
+
+  // pivote: notas[estId][matId] = [t1,t2,t3]
+  var notas = {};
+  rc.data.forEach(function(n){
+    if(n.trimestre<1||n.trimestre>3) return;
+    (notas[n.estudiante_id] = notas[n.estudiante_id] || {});
+    (notas[n.estudiante_id][n.materia_id] = notas[n.estudiante_id][n.materia_id] || [null,null,null]);
+    notas[n.estudiante_id][n.materia_id][n.trimestre-1] = n.total_parcial===null?null:parseFloat(n.total_parcial);
+  });
+
+  // encabezado agrupado
+  var grp = '<tr class="mat-grp"><th class="col-est">Estudiante</th>';
+  mats.forEach(function(m){ grp += '<th colspan="5" style="white-space:normal;max-width:170px">'+m.nombre+'</th>'; });
+  grp += '<th class="col-res" rowspan="2">Prom.<br>Gral</th><th class="col-res" rowspan="2"># en<br>Supl.</th></tr>';
+  var sub = '<tr class="mat-sub"><th class="col-est"></th>';
+  mats.forEach(function(){ sub += '<th>T1</th><th>T2</th><th>T3</th><th>Prom</th><th>Supl.</th>'; });
+  sub += '</tr>';
+
+  var filas = ests.map(function(e,i){
+    var p = e.profiles||{};
+    var nombre = ((p.apellidos||'')+' '+(p.nombres||'')).trim() || ('#'+e.id);
+    var promsGral = [], nSup = 0;
+    var celdas = mats.map(function(m){
+      var t = (notas[e.id] && notas[e.id][m.id]) || [null,null,null];
+      var pr = promArr(t);
+      var tdT = t.map(function(v){ return '<td>'+(v===null?'<span class="gv-empty">—</span>':v.toFixed(2))+'</td>'; }).join('');
+      var prov = pr.n>0 && pr.n<3;
+      var promTxt = pr.prom===null ? '<span class="gv-empty">—</span>'
+        : '<span class="'+bandClass(pr.prom)+'">'+pr.prom.toFixed(2)+'</span>'+(prov?' <span class="badge b-gray" style="font-size:.55rem;padding:0 4px">'+pr.n+'/3</span>':'');
+      var promCls = pr.prom===null?'':(pr.prom>=7?'':(pr.prom>=5?'c-sup':'c-fail'));
+      if(pr.prom!==null){ promsGral.push(pr.prom); if(pr.prom<7) nSup++; }
+      // bloque libre de supletorio: input solo donde el promedio < 7
+      var key = e.id+'-'+m.id;
+      var suplCell;
+      if(pr.prom!==null && pr.prom<7){
+        suplCell = '<td class="suplfree"><input type="text" inputmode="decimal" data-k="'+key+'" value="'+(sabanaSupl[key]||'')+'" onchange="guardarSupletorio(this,'+e.id+','+m.id+')"></td>';
+      } else {
+        suplCell = '<td><span class="gv-empty">·</span></td>';
+      }
+      return tdT+'<td class="prom '+promCls+'">'+promTxt+'</td>'+suplCell;
+    }).join('');
+    var pg = promArr(promsGral).prom;
+    var pgTxt = pg===null?'—':'<span class="'+bandClass(pg)+'">'+pg.toFixed(2)+'</span>';
+    return '<tr><td class="col-est"><span style="color:var(--text3);margin-right:6px;font-size:.7rem">'+(i+1)+'</span>'+nombre+'</td>'+
+      celdas+'<td class="col-res prom">'+pgTxt+'</td>'+
+      '<td class="col-res">'+(nSup||'<span class="gv-empty">0</span>')+'</td></tr>';
+  }).join('');
+
+  cont.innerHTML = '<div class="sab-wrap"><div class="sab-scroll"><table class="sabana"><thead>'+grp+sub+'</thead><tbody>'+filas+'</tbody></table></div>'+
+    '<div class="tbl-footer"><span>'+currentCursoSabana.nombre+' — '+ests.length+' estudiantes — '+mats.length+' materias</span>'+
+    '<span style="color:var(--text3)">Promedio anual = media de los trimestres con nota. Solo lectura (el bloque Supl. no se guarda en la base).</span></div></div>';
+}
+
+function exportarSabanaPDF(){
+  if(!currentCursoSabana){ alert('Selecciona un curso primero'); return; }
+  if(typeof window.jspdf==='undefined'){ alert('jsPDF no cargado'); return; }
+  var tabla = document.querySelector('#sabana-container table.sabana');
+  if(!tabla){ alert('Carga la sábana primero'); return; }
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  doc.setFillColor(26,26,46); doc.rect(0,0,297,22,'F');
+  doc.setTextColor(240,201,106); doc.setFont('helvetica','bold'); doc.setFontSize(12);
+  doc.text('COLEGIO PARTICULAR MIXTO "CHARLES BABBAGE"',148,10,{align:'center'});
+  doc.setFontSize(8); doc.setTextColor(200,180,120);
+  doc.text('Sábana anual (promedios) — '+currentCursoSabana.nombre+' — Período 2025-2026',148,17,{align:'center'});
+  // PDF compacto: solo el PROMEDIO anual por materia (las 70 columnas no caben en A4)
+  var matNames = [];
+  tabla.querySelectorAll('thead tr.mat-grp th').forEach(function(th,i){ if(i>0 && th.getAttribute('colspan')==='5') matNames.push(th.textContent.trim()); });
+  var headers = ['#','Estudiante'].concat(matNames).concat(['Prom','Supl']);
+  var rows = [];
+  tabla.querySelectorAll('tbody tr').forEach(function(tr,i){
+    var tds = tr.querySelectorAll('td');
+    var nombre = tds[0].textContent.replace(/^\s*\d+\s*/,'').trim();
+    var row = [i+1, nombre];
+    // por cada materia: la col Prom es la 4ta de cada bloque de 5 (índices 1..5 -> prom en offset 4)
+    for(var c=0;c<matNames.length;c++){
+      var idx = 1 + c*5 + 4; // td0=est, luego bloques de 5 (T1,T2,T3,Prom,Supl)
+      row.push(tds[idx]?tds[idx].textContent.replace(/\d+\/3/,'').trim():'—');
+    }
+    var promG = tds[tds.length-2], nsup = tds[tds.length-1];
+    row.push(promG?promG.textContent.trim():'', nsup?nsup.textContent.trim():'');
+    rows.push(row);
+  });
+  doc.autoTable({startY:26,head:[headers],body:rows,
+    styles:{fontSize:6,cellPadding:1.6,halign:'center'},
+    headStyles:{fillColor:[155,22,38],textColor:255,fontStyle:'bold',fontSize:5.5},
+    bodyStyles:{textColor:[26,26,46]},alternateRowStyles:{fillColor:[247,246,243]},
+    columnStyles:{0:{cellWidth:7},1:{halign:'left',cellWidth:34}}
+  });
+  doc.save('sabana_anual_'+currentCursoSabana.nombre.replace(/ /g,'_')+'.pdf');
+}
+
+// Guarda (o borra) la nota de supletorio en la tabla 'supletorios'. No toca calificaciones.
+async function guardarSupletorio(input, estId, matId){
+  var key = estId+'-'+matId;
+  var txt = (input.value||'').trim().replace(',','.');
+  input.style.borderColor = 'var(--gold2)'; input.style.borderStyle='solid';
+  try{
+    if(txt===''){
+      sabanaSupl[key] = '';
+      await sb.from('supletorios').delete().eq('estudiante_id',estId).eq('materia_id',matId);
+    } else {
+      var n = parseFloat(txt);
+      if(isNaN(n) || n<0 || n>10){ input.style.borderColor='var(--red)'; alert('La nota de supletorio debe ser un número entre 0 y 10'); return; }
+      sabanaSupl[key] = String(n);
+      var r = await sb.from('supletorios').upsert(
+        {estudiante_id:estId, materia_id:matId, curso_id: currentCursoSabana?currentCursoSabana.id:null, nota:n, updated_at:new Date().toISOString()},
+        {onConflict:'estudiante_id,materia_id'});
+      if(r.error){ throw r.error; }
+    }
+    input.style.borderColor = 'var(--green)';
+    setTimeout(function(){ input.style.borderColor='var(--gold2)'; input.style.borderStyle='dashed'; }, 900);
+  }catch(e){
+    input.style.borderColor = 'var(--red)';
+    alert('No se pudo guardar el supletorio: '+(e.message||e));
+  }
+}
+
+// ─── SUPLETORIO (ANUAL: promedio de los tres trimestres) ───
 async function loadSupletorio(){
   var grid = document.getElementById('sup-grid');
   grid.innerHTML = '<div style="text-align:center;padding:28px;color:var(--text3)">⏳ Cargando...</div>';
-  var r = await sb.from('calificaciones').select(
-    'total_parcial,materia_id,materias(nombre),estudiante_id,'+
-    'estudiantes(curso_id,profiles(nombres,apellidos),cursos(nombre))'
-  ).lt('total_parcial',7).eq('trimestre',currentTrimSup).not('total_parcial','is',null);
 
+  var r = await fetchCalifPaginado(
+    'total_parcial,trimestre,materia_id,materias(nombre),estudiante_id,'+
+    'estudiantes(curso_id,profiles(nombres,apellidos),cursos(nombre))', null);
   if(r.error){ grid.innerHTML='<div style="text-align:center;padding:28px;color:var(--red)">Error: '+r.error.message+'</div>'; return; }
-  if(!r.data||!r.data.length){
+
+  // Agrupar trimestres por estudiante+materia
+  var acc = {}; // "est-mat" -> {est, cn, nombre, mat, t:[..]}
+  (r.data||[]).forEach(function(n){
+    var est = n.estudiantes; if(!est) return;
+    var k = n.estudiante_id+'-'+n.materia_id;
+    if(!acc[k]){
+      var p = est.profiles||{};
+      acc[k] = { estId:n.estudiante_id, cn: est.cursos?est.cursos.nombre:'Sin curso',
+        nombre:((p.apellidos||'')+' '+(p.nombres||'')).trim(),
+        mat: n.materias?n.materias.nombre:'—', t:[null,null,null] };
+    }
+    if(n.trimestre>=1 && n.trimestre<=3) acc[k].t[n.trimestre-1] = n.total_parcial===null?null:parseFloat(n.total_parcial);
+  });
+
+  // Quedarnos con materias cuyo PROMEDIO ANUAL < 7
+  var byCurso = {};
+  Object.keys(acc).forEach(function(k){
+    var d = acc[k];
+    var pr = promArr(d.t);
+    if(pr.prom===null || pr.prom>=7) return;
+    if(!byCurso[d.cn]) byCurso[d.cn] = {};
+    if(!byCurso[d.cn][d.estId]) byCurso[d.cn][d.estId] = {nombre:d.nombre, materias:[]};
+    byCurso[d.cn][d.estId].materias.push({mat:d.mat, prom:pr.prom, prov:pr.n<3});
+  });
+
+  var totalSup = Object.keys(byCurso).reduce(function(a,cn){return a+Object.keys(byCurso[cn]).length;},0);
+  if(!totalSup){
     grid.innerHTML = '<div class="card" style="text-align:center;padding:36px;grid-column:1/-1">'+
       '<div style="font-size:2rem;margin-bottom:8px">🎉</div>'+
-      '<div style="font-family:\'Cinzel\',serif;font-size:.92rem;color:var(--text)">Sin supletorio en Trimestre '+currentTrimSup+'</div>'+
-      '<div style="font-size:.78rem;color:var(--text3);margin-top:4px">Todos los estudiantes están aprobados</div></div>';
+      '<div style="font-family:\'Cinzel\',serif;font-size:.92rem;color:var(--text)">Sin supletorios</div>'+
+      '<div style="font-size:.78rem;color:var(--text3);margin-top:4px">Ningún promedio anual por debajo de 7.00 (recuerda que es provisional mientras falte el T3)</div></div>';
     return;
   }
 
-  // Agrupar por curso
-  var byCurso = {};
-  (r.data||[]).forEach(function(n){
-    var est = n.estudiantes;
-    if(!est) return;
-    var cn = est.cursos ? est.cursos.nombre : 'Sin curso';
-    if(!byCurso[cn]) byCurso[cn] = [];
-    var p = est.profiles||{};
-    var nombre = (p.apellidos||'')+' '+(p.nombres||'');
-    // Check if student already in list for this curso
-    var existing = byCurso[cn].find(function(x){return x.nombre===nombre;});
-    if(!existing){
-      byCurso[cn].push({nombre:nombre, materias:[{mat:n.materias?n.materias.nombre:'—',nota:parseFloat(n.total_parcial||0)}]});
-    } else {
-      existing.materias.push({mat:n.materias?n.materias.nombre:'—',nota:parseFloat(n.total_parcial||0)});
-    }
-  });
-
-  var html = '';
   var cursoOrder = ['Octavo','Noveno','Décimo','Primero BGU','Segundo BGU','Tercero BGU'];
-  cursoOrder.forEach(function(cn){
-    if(!byCurso[cn]) return;
-    var items = byCurso[cn];
-    html += '<div class="sup-card">'+
-      '<div class="sup-card-head">'+
-      '<span class="sup-card-curso">'+cn+'</span>'+
-      '<span class="badge b-orange">'+items.length+' en supletorio</span>'+
-      '</div>'+
+  var orden = cursoOrder.filter(function(c){return byCurso[c];})
+    .concat(Object.keys(byCurso).filter(function(c){return cursoOrder.indexOf(c)<0;}));
+  var html = orden.map(function(cn){
+    var ests = Object.keys(byCurso[cn]).map(function(id){return byCurso[cn][id];})
+      .sort(function(a,b){return a.nombre.localeCompare(b.nombre,'es');});
+    return '<div class="sup-card">'+
+      '<div class="sup-card-head"><span class="sup-card-curso">'+cn+'</span>'+
+      '<span class="badge b-orange">'+ests.length+' en supletorio</span></div>'+
       '<div class="sup-list">'+
-      items.map(function(st){
-        var mats = st.materias.map(function(m){return m.mat+' ('+m.nota.toFixed(2)+')';}).join(', ');
-        return '<div class="sup-item">'+
-          '<span class="sup-item-name">'+st.nombre+'</span>'+
-          '<span class="sup-item-nota" title="'+mats+'">'+st.materias.length+' mat.</span>'+
-          '</div>';
+      ests.map(function(st){
+        var det = st.materias.map(function(m){return m.mat+' ('+m.prom.toFixed(2)+(m.prov?' prov.':'')+')';}).join(', ');
+        return '<div class="sup-item"><span class="sup-item-name">'+st.nombre+'</span>'+
+          '<span class="sup-item-nota" title="'+det.replace(/"/g,'')+'">'+st.materias.length+' mat.</span></div>';
       }).join('')+
-      '</div>'+
-      '</div>';
-  });
-  grid.innerHTML = html || '<div style="text-align:center;padding:28px;color:var(--text3)">Sin datos</div>';
+      '</div></div>';
+  }).join('');
+  grid.innerHTML = html;
 }
 
 // ─── CONTROL DE NOTAS ───
