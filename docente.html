@@ -1,826 +1,168 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Docente — Charles Babbage</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema temporalmente suspendido</title>
+
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --red:#9b1626;--red2:#c41e36;
-  --gold:#b8922a;--gold2:#d4a942;--gold3:#f0c96a;
-  --dark:#1a1a2a;--dark2:#242436;
-  --white:#fff;--bg:#f7f6f3;--bg2:#eeecea;
-  --text:#1a1a2e;--text2:#4a4a6a;--text3:#8888aa;
-  --border:#e2dfd8;--shadow:0 2px 16px rgba(0,0,0,.07);
-  --green:#16a34a;--orange:#d97706;
-  --sw:260px;--th:64px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
-/* OVERLAY para cerrar sidebar en móvil */
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;backdrop-filter:blur(2px)}
-.sidebar-overlay.open{display:block}
 
-/* SIDEBAR */
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:var(--dark);display:flex;flex-direction:column;z-index:100;box-shadow:4px 0 24px rgba(0,0,0,.2);transition:transform .3s}
-.sidebar-logo{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
-.logo-icon{width:36px;height:36px}
-.logo-text span{font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:.15em;color:var(--gold2);text-transform:uppercase;opacity:.7;display:block}
-.logo-text strong{font-family:'Cinzel',serif;font-size:.85rem;font-weight:600;color:#fff}
-.sidebar-profile{margin:12px 14px;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px}
-.sp-name{font-size:.85rem;font-weight:600;color:#fff;margin-bottom:2px}
-.sp-sub{font-size:.7rem;color:rgba(255,255,255,.35)}
-.sp-badge{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:12px;font-size:.62rem;font-weight:700;background:rgba(184,146,42,.15);color:var(--gold2);border:1px solid rgba(184,146,42,.25)}
-.nav-section{padding:6px 0}
-.nav-label{padding:5px 20px;font-size:.57rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.22);font-weight:600}
-.nav-item{display:flex;align-items:center;gap:11px;padding:9px 20px;cursor:pointer;transition:all .2s;border-left:3px solid transparent;color:rgba(255,255,255,.45);font-size:.85rem}
-.nav-item:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.04)}
-.nav-item.active{color:#fff;background:linear-gradient(90deg,rgba(155,22,38,.2),transparent);border-left-color:var(--red2)}
-.nav-materia{padding:6px 20px 6px 44px;cursor:pointer;color:rgba(255,255,255,.35);font-size:.78rem;transition:all .2s;border-left:3px solid transparent}
-.nav-materia:hover{color:rgba(255,255,255,.65)}
-.nav-materia.active{color:var(--gold3);border-left-color:var(--gold2)}
-.sidebar-footer{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.06)}
-.btn-logout{width:100%;padding:9px;background:rgba(155,22,38,.12);border:1px solid rgba(155,22,38,.22);border-radius:8px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;font-size:.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s}
-.btn-logout:hover{background:rgba(155,22,38,.28);color:#fff}
-
-/* TOPBAR */
-.topbar{position:fixed;top:0;left:var(--sw);right:0;height:var(--th);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:90;box-shadow:var(--shadow)}
-.page-title{font-family:'Cinzel',serif;font-size:1rem;font-weight:600;color:var(--text)}
-.breadcrumb{font-size:.7rem;color:var(--text3)}
-.breadcrumb span{color:var(--red)}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.topbar-date{font-size:.72rem;color:var(--text3)}
-.avatar-top{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem}
-.hamburger{display:none;background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--text2)}
-
-/* MAIN */
-.main{margin-left:var(--sw);margin-top:var(--th);height:calc(100vh - var(--th));overflow-y:auto;overflow-x:hidden;padding:24px 28px}
-/* Sidebar scroll interno (materias largas) */
-.sidebar{overflow-y:auto;overflow-x:hidden}
-.sidebar::-webkit-scrollbar{width:4px}
-.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px}
-.section{display:none;animation:fadeIn .3s ease}
-.section.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-/* DASHBOARD */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-.stat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
-.stat-icon{font-size:1.5rem;margin-bottom:8px}
-.stat-num{font-family:'Cinzel',serif;font-size:1.7rem;font-weight:700;color:var(--text)}
-.stat-label{font-size:.73rem;color:var(--text3);margin-top:3px}
-
-/* SECTION HEADER */
-.section-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
-.section-header h2{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:600;color:var(--text)}
-.section-header p{font-size:.76rem;color:var(--text3);margin-top:2px}
-.actions-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
-.btn-primary{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;box-shadow:0 2px 10px rgba(155,22,38,.3)}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(155,22,38,.4)}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff}
-.btn-gold:hover{transform:translateY(-1px)}
-.btn-outline{background:var(--white);color:var(--text2);border:1px solid var(--border)}
-.btn-outline:hover{border-color:var(--gold2)}
-.btn-sm{padding:6px 12px;font-size:.75rem}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
-/* TRIMESTER SELECTOR */
-.trim-tabs{display:flex;gap:0;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:18px;width:fit-content}
-.trim-tab{padding:7px 20px;border-radius:6px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;color:var(--text3);cursor:pointer;transition:all .2s}
-.trim-tab.active{background:var(--white);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.1);font-weight:600}
-
-/* STATUS BADGE */
-.status-open{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:600;background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.2)}
-.status-closed{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:600;background:rgba(155,22,38,.1);color:var(--red);border:1px solid rgba(155,22,38,.2)}
-
-/* GRADE TABLE */
-.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
-.table-scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-thead th{background:var(--bg);padding:10px 12px;text-align:center;font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
-thead th:first-child,thead th:nth-child(2){text-align:left}
-tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:rgba(248,246,243,.7)}
-tbody td{padding:10px 12px;font-size:.82rem;color:var(--text);vertical-align:middle;text-align:center}
-tbody td:first-child,tbody td:nth-child(2){text-align:left}
-
-/* GRADE INPUT */
-.grade-input{width:58px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.82rem;text-align:center;color:var(--text);background:var(--bg);transition:all .2s;-moz-appearance:textfield}
-.grade-input::-webkit-inner-spin-button,.grade-input::-webkit-outer-spin-button{-webkit-appearance:none}
-.grade-input:focus{outline:none;border-color:var(--gold2);background:var(--white);box-shadow:0 0 0 3px rgba(212,169,66,.1)}
-.grade-input:disabled{background:var(--bg2);color:var(--text3);cursor:not-allowed}
-.grade-input.error{border-color:var(--red2);background:rgba(155,22,38,.05)}
-
-/* TOTAL CELL */
-.total-pass{font-weight:700;color:var(--green)}
-.total-sup{font-weight:700;color:var(--orange)}
-.total-fail{font-weight:700;color:var(--red)}
-.total-empty{color:var(--text3);font-style:italic;font-size:.75rem}
-
-/* BADGE */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:.68rem;font-weight:600}
-.badge-green{background:rgba(22,163,74,.1);color:var(--green)}
-.badge-orange{background:rgba(217,119,6,.1);color:var(--orange)}
-.badge-red{background:rgba(155,22,38,.1);color:var(--red)}
-.badge-gray{background:rgba(100,100,120,.1);color:var(--text3)}
-
-/* FORMULA BAR */
-.formula-bar{background:linear-gradient(135deg,rgba(184,146,42,.06),rgba(184,146,42,.02));border:1px solid rgba(184,146,42,.15);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:.75rem;color:var(--text2)}
-.formula-bar b{color:var(--gold);font-family:'Cinzel',serif}
-
-/* TABLE FOOTER */
-.table-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border);background:var(--bg);flex-wrap:wrap;gap:8px}
-.table-footer span{font-size:.73rem;color:var(--text3)}
-
-/* SAVE BAR */
-.save-bar{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 16px rgba(0,0,0,.06);z-index:10}
-.save-msg{font-size:.78rem;color:var(--text3)}
-.save-msg.ok{color:var(--green)}
-.save-msg.err{color:var(--red)}
-
-/* ALERT */
-.alert{padding:14px 18px;border-radius:10px;font-size:.82rem;margin-bottom:18px}
-.alert-warning{background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.2);color:var(--orange)}
-.alert-info{background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.15);color:#2563eb}
-
-@media(max-width:768px){
-  .sidebar{transform:translateX(-100%);overflow-y:auto}
-  .sidebar.open{transform:translateX(0)}
-  .topbar{left:0;margin-left:0}
-  .main{margin-left:0;padding:16px}
-  .hamburger{display:block}
-  .stats-row{grid-template-columns:1fr 1fr}
-  .section-header{flex-direction:column;align-items:flex-start}
-  .trim-tabs{overflow-x:auto;width:100%}
-  .save-bar{flex-direction:column;align-items:flex-start;gap:8px}
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background:
+        radial-gradient(circle at top, #192c45, #080d18 65%);
+    color: #fff;
+    padding: 20px;
 }
+
+.container {
+    max-width: 650px;
+    width: 100%;
+    text-align: center;
+    padding: 55px 35px;
+    background: rgba(16, 27, 44, 0.92);
+    border: 1px solid #263b55;
+    border-radius: 18px;
+    box-shadow: 0 20px 70px rgba(0,0,0,.5);
+}
+
+.icon {
+    font-size: 65px;
+    margin-bottom: 25px;
+}
+
+.status {
+    display: inline-block;
+    padding: 8px 18px;
+    background: rgba(239, 68, 68, .13);
+    border: 1px solid #ef4444;
+    color: #ff6464;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: clamp(27px, 5vw, 38px);
+    margin-bottom: 18px;
+    line-height: 1.2;
+}
+
+h1 span {
+    color: #f59e0b;
+}
+
+.description {
+    color: #aab7c8;
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.divider {
+    height: 1px;
+    background: #29394e;
+    margin: 30px 0;
+}
+
+.warning {
+    background: rgba(245, 158, 11, .08);
+    border-left: 3px solid #f59e0b;
+    padding: 18px;
+    text-align: left;
+    color: #d5deea;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+.contact {
+    display: inline-block;
+    text-decoration: none;
+    background: #f59e0b;
+    color: #111827;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.contact:hover {
+    background: #fbbf24;
+    transform: translateY(-3px);
+}
+
+.footer {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 35px;
+    line-height: 1.8;
+}
+
 </style>
 </head>
+
 <body>
 
-<!-- OVERLAY móvil -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="container">
 
-<!-- SIDEBAR -->
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
-      <rect width="36" height="36" rx="7" fill="#0d0d0d"/>
-      <path d="M18 2 L33 8 L33 22 Q33 31 18 34 Q3 31 3 22 L3 8 Z" fill="#b8922a"/>
-      <path d="M18 4 L31 9 L31 21 Q31 29 18 32 Q5 29 5 21 L5 9 Z" fill="#0d0d0d"/>
-      <path d="M5 9 L31 20 L31 22 L5 18 Z" fill="#9b1626" opacity=".8"/>
-      <path d="M5 18 L31 20 L31 29 Q18 34 18 34 Q5 34 5 29 Z" fill="#9b1626"/>
-      <text x="11" y="18" font-family="serif" font-size="7" fill="#f0c96a" font-style="italic">CB</text>
-    </svg>
-    <div class="logo-text">
-      <span>Colegio Charles Babbage</span>
-      <strong>Sistema Académico</strong>
-    </div>
-  </div>
+    <div class="icon">⚠️</div>
 
-  <div class="sidebar-profile">
-    <div class="sp-name" id="sp-name">Cargando...</div>
-    <div class="sp-sub">Período 2025–2026</div>
-    <span class="sp-badge" id="sp-materia">—</span>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-label">General</div>
-    <div class="nav-item active" onclick="showSection('dashboard',this)">
-      <span>🏠</span> Dashboard
-    </div>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-label">Mis Materias</div>
-    <div id="nav-materias"></div>
-  </div>
-
-  <div class="sidebar-footer">
-    <button class="btn-logout" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
-  </div>
-</nav>
-
-<!-- TOPBAR -->
-<header class="topbar">
-  <div style="display:flex;align-items:center;gap:12px">
-    <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <div>
-      <div class="page-title" id="page-title">Dashboard</div>
-      <div class="breadcrumb">Docente / <span id="bc-sub">Inicio</span></div>
-    </div>
-  </div>
-  <div class="topbar-right">
-    <span class="topbar-date" id="topbar-date"></span>
-    <div class="avatar-top" id="avatar-top">?</div>
-  </div>
-</header>
-
-<!-- MAIN -->
-<main class="main">
-
-  <!-- DASHBOARD -->
-  <div class="section active" id="sec-dashboard">
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon">📚</div>
-        <div class="stat-num" id="dash-materias">—</div>
-        <div class="stat-label">Materias asignadas</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🎓</div>
-        <div class="stat-num" id="dash-estudiantes">—</div>
-        <div class="stat-label">Estudiantes a cargo</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📝</div>
-        <div class="stat-num" id="dash-notas">—</div>
-        <div class="stat-label">Notas ingresadas</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📅</div>
-        <div class="stat-num" id="dash-trim">T2</div>
-        <div class="stat-label">Trimestre activo</div>
-      </div>
-    </div>
-    <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--shadow)">
-      <div style="font-family:'Cinzel',serif;font-size:.88rem;font-weight:600;margin-bottom:14px">Mis cursos y materias</div>
-      <div id="dash-cursos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
-        <div style="color:var(--text3);font-size:.82rem;padding:16px;text-align:center">⏳ Cargando...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- NOTAS SECTION (dinámico por materia+curso) -->
-  <div class="section" id="sec-notas">
-    <div class="section-header">
-      <div>
-        <h2 id="notas-titulo">Registro de Notas</h2>
-        <p id="notas-subtitulo">Cargando...</p>
-      </div>
-      <div class="actions-bar">
-        <span id="estado-periodo"></span>
-        <button class="btn btn-gold btn-sm" onclick="exportarPDF()" id="btn-pdf">📄 PDF</button>
-      </div>
+    <div class="status">
+        SERVICIO TEMPORALMENTE SUSPENDIDO
     </div>
 
-    <div class="formula-bar">
-      <b>Fórmula:</b> &nbsp;(Promedio Insumos × 0.80) + (Prueba × 0.20) = Total Parcial &nbsp;|&nbsp; <b>Estado anual</b>: promedio de los 3 trimestres &nbsp;—&nbsp; Aprobado ≥ <b>7.00</b> &nbsp;|&nbsp; Supletorio &lt; 7.00
+    <h1>
+        Sistema <span>Fuera de Servicio</span>
+    </h1>
+
+    <p class="description">
+        Actualmente, esta plataforma se encuentra
+        temporalmente inhabilitada debido a la falta
+        de renovación de los servicios de infraestructura
+        tecnológica.
+    </p>
+
+    <div class="warning">
+        <strong>Motivo de la suspensión:</strong><br>
+        • Renovación pendiente del servicio de base de datos Supabase.<br>
+        • Renovación pendiente del dominio web.<br><br>
+        El acceso al sistema será restablecido una vez
+        regularizados los servicios correspondientes.
     </div>
 
-    <div class="trim-tabs">
-      <button class="trim-tab" onclick="selTrim(1,this)">Trimestre 1</button>
-      <button class="trim-tab active" onclick="selTrim(2,this)">Trimestre 2</button>
-      <button class="trim-tab" onclick="selTrim(3,this)">Trimestre 3</button>
+    <p class="description">
+        Para obtener información sobre la reactivación
+        de la plataforma, comuníquese directamente
+        con el administrador del sistema.
+    </p>
+
+    <a class="contact"
+       href="mailto:administrador@tudominio.com?subject=Solicitud%20de%20reactivacion">
+        CONTACTAR AL ADMINISTRADOR
+    </a>
+
+    <div class="divider"></div>
+
+    <div class="footer">
+        SISTEMA DE INFORMACIÓN<br>
+        Aviso de mantenimiento administrativo e infraestructura.<br>
+        © 2026 - Todos los derechos reservados.
     </div>
 
-    <div id="notas-alert"></div>
+</div>
 
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table id="notas-table">
-          <thead>
-            <tr>
-              <th style="width:32px">#</th>
-              <th style="min-width:160px">Estudiante</th>
-              <th>Insumo 1</th>
-              <th>Insumo 2</th>
-              <th>Insumo 3</th>
-              <th>Insumo 4</th>
-              <th style="background:rgba(155,22,38,.05)">Prueba</th>
-              <th>Prom. Ins.</th>
-              <th>Total Notas<br><small>×0.80</small></th>
-              <th>Total Prueba<br><small>×0.20</small></th>
-              <th style="min-width:80px">Total</th>
-              <th style="min-width:80px;background:rgba(22,163,74,.05)">Prom. anual<br><small>3 trim.</small></th>
-              <th>Estado anual</th>
-              <th>Nota Supl.<br><small>si prom &lt; 7</small></th>
-            </tr>
-          </thead>
-          <tbody id="notas-tbody">
-            <tr><td colspan="14" style="text-align:center;padding:32px;color:var(--text3)">⏳ Cargando...</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="save-bar">
-        <span class="save-msg" id="save-msg">Los cambios se guardan automáticamente</span>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-outline btn-sm" onclick="cargarNotas()">↺ Recargar</button>
-          <button class="btn btn-primary btn-sm" onclick="guardarTodo()" id="btn-guardar">💾 Guardar Todo</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</main>
-
-<script>
-const SUPA_URL = 'https://lesomndhkrihswsxmbom.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxlc29tbmRoa3JpaHN3c3htYm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzOTI5ODYsImV4cCI6MjA4ODk2ODk4Nn0.VDE12Q-sl_y5_l4_vYvC0Qxgom_p2U6Ywd6SpH2mfXk';
-const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-
-let currentUser = null;
-let currentProfile = null;
-let asignaciones = [];
-let currentMateriaId = null;
-let currentCursoId = null;
-let currentCursoNombre = '';
-let currentMateriaNombre = '';
-let currentTrim = 2;
-let periodosAbiertos = {};
-let notasData = {};
-let otrosTrim = {}; // estId -> {sum,count} de los OTROS trimestres (para estado anual)
-let suplMap = {};   // estId -> nota de supletorio (materia+curso actual)
-
-// ─── AUTH GUARD ───
-(async function(){
-  const {data:{session}} = await sb.auth.getSession();
-  if(!session){ window.location.href='login.html'; return; }
-
-  const {data:roles} = await sb.from('user_roles').select('rol').eq('user_id',session.user.id);
-  if(!roles||!roles.some(function(r){return r.rol==='docente';})){
-    window.location.href='login.html'; return;
-  }
-  currentUser = session.user;
-
-  const {data:p} = await sb.from('profiles').select('nombres,apellidos,cedula').eq('id',session.user.id).single();
-  if(p){
-    currentProfile = p;
-    var fullName = p.apellidos+' '+p.nombres;
-    var initials = ((p.nombres||'')[0]||'').toUpperCase()+((p.apellidos||'')[0]||'').toUpperCase();
-    document.getElementById('sp-name').textContent = fullName;
-    document.getElementById('avatar-top').textContent = initials;
-  }
-
-  await cargarAsignaciones();
-  await cargarPeriodos();
-  renderDashboard();
-})();
-
-async function cerrarSesion(){
-  await sb.auth.signOut();
-  window.location.href='login.html';
-}
-
-// DATE
-document.getElementById('topbar-date').textContent =
-  new Date().toLocaleDateString('es-EC',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-// ─── CARGAR ASIGNACIONES ───
-async function cargarAsignaciones(){
-  var {data,error} = await sb.from('docente_materia_curso').select(
-    'id,materias(id,nombre,icono),cursos(id,nombre)'
-  ).eq('docente_id',currentUser.id).eq('activo',true).order('id');
-
-  if(error||!data){ asignaciones=[]; return; }
-  asignaciones = data;
-
-  // Sidebar materias
-  var materiaMap = {};
-  data.forEach(function(a){
-    var mid = a.materias.id;
-    if(!materiaMap[mid]) materiaMap[mid]={id:mid,nombre:a.materias.nombre,icono:a.materias.icono,cursos:[]};
-    materiaMap[mid].cursos.push({id:a.cursos.id,nombre:a.cursos.nombre,asigId:a.id});
-  });
-
-  var navHtml = '';
-  Object.values(materiaMap).forEach(function(m){
-    navHtml += '<div class="nav-item" onclick="abrirMateria('+m.id+',null,this)">'+
-      '<span>'+(m.icono||'📚')+'</span> '+m.nombre+'</div>';
-    m.cursos.forEach(function(c){
-      navHtml += '<div class="nav-materia" onclick="abrirMateria('+m.id+','+c.id+',this)" id="nav-'+m.id+'-'+c.id+'">'+
-        c.nombre+'</div>';
-    });
-  });
-  document.getElementById('nav-materias').innerHTML = navHtml;
-
-  // Actualizar badge sidebar
-  var materias = Object.keys(materiaMap);
-  document.getElementById('sp-materia').textContent = materias.length+' materia'+(materias.length!==1?'s':'');
-}
-
-// ─── CARGAR PERIODOS ───
-async function cargarPeriodos(){
-  var {data} = await sb.from('control_notas').select('trimestre,curso_id,abierto');
-  if(!data) return;
-  data.forEach(function(p){
-    var key = p.trimestre+'-'+p.curso_id;
-    periodosAbiertos[key] = p.abierto;
-  });
-}
-
-// ─── DASHBOARD ───
-function renderDashboard(){
-  var materiaIds = [...new Set(asignaciones.map(function(a){return a.materias.id;}))];
-  var cursoIds = [...new Set(asignaciones.map(function(a){return a.cursos.id;}))];
-  document.getElementById('dash-materias').textContent = materiaIds.length;
-
-  // Contar estudiantes únicos
-  sb.from('estudiantes').select('id',{count:'exact',head:true}).in('curso_id',cursoIds).then(function(r){
-    document.getElementById('dash-estudiantes').textContent = r.count||0;
-  });
-
-  // Contar notas ingresadas
-  sb.from('calificaciones').select('id',{count:'exact',head:true}).eq('docente_id',currentUser.id).then(function(r){
-    document.getElementById('dash-notas').textContent = r.count||0;
-  });
-
-  // Grid de cursos
-  var materiaMap = {};
-  asignaciones.forEach(function(a){
-    var mid = a.materias.id;
-    if(!materiaMap[mid]) materiaMap[mid]={nombre:a.materias.nombre,icono:a.materias.icono,cursos:[]};
-    materiaMap[mid].cursos.push(a.cursos.nombre);
-  });
-
-  var html = '';
-  Object.values(materiaMap).forEach(function(m){
-    html += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer" '+
-      'onclick="abrirMateria(null,null,null)">'+
-      '<div style="font-size:1.3rem;margin-bottom:6px">'+(m.icono||'📚')+'</div>'+
-      '<div style="font-weight:600;font-size:.85rem;margin-bottom:6px;color:var(--text)">'+m.nombre+'</div>'+
-      m.cursos.map(function(c){return '<span style="display:inline-block;margin:2px;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:600;background:rgba(37,99,235,.1);color:#2563eb">'+c+'</span>';}).join('')+
-      '</div>';
-  });
-  document.getElementById('dash-cursos-grid').innerHTML = html||'<p style="color:var(--text3);font-size:.82rem">No hay asignaciones registradas.</p>';
-}
-
-// ─── ABRIR MATERIA + CURSO ───
-function abrirMateria(materiaId, cursoId, el){
-  // Si no se especifica curso, tomar el primero de esa materia
-  if(!cursoId && materiaId){
-    var asig = asignaciones.filter(function(a){return a.materias.id===materiaId;});
-    if(asig.length){ cursoId=asig[0].cursos.id; materiaId=asig[0].materias.id; }
-  }
-  if(!materiaId||!cursoId) return;
-
-  currentMateriaId = materiaId;
-  currentCursoId = cursoId;
-
-  var asig = asignaciones.find(function(a){return a.materias.id===materiaId&&a.cursos.id===cursoId;});
-  if(asig){
-    currentMateriaNombre = asig.materias.nombre;
-    currentCursoNombre = asig.cursos.nombre;
-  }
-
-  document.querySelectorAll('.nav-item,.nav-materia').forEach(function(n){n.classList.remove('active');});
-  if(el) el.classList.add('active');
-
-  showSection('notas', null);
-  document.getElementById('page-title').textContent = currentMateriaNombre;
-  document.getElementById('bc-sub').textContent = currentCursoNombre;
-  document.getElementById('notas-titulo').textContent = currentMateriaNombre+' — '+currentCursoNombre;
-
-  cargarNotas();
-}
-
-// ─── SELECTOR TRIMESTRE ───
-function selTrim(t, btn){
-  currentTrim = t;
-  document.querySelectorAll('.trim-tab').forEach(function(b){b.classList.remove('active');});
-  btn.classList.add('active');
-  cargarNotas();
-}
-
-// ─── CARGAR NOTAS ───
-async function cargarNotas(){
-  var tbody = document.getElementById('notas-tbody');
-  tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;padding:32px;color:var(--text3)">⏳ Cargando estudiantes...</td></tr>';
-
-  var periodoKey = currentTrim+'-'+currentCursoId;
-  var abierto = periodosAbiertos[periodoKey];
-
-  // Estado periodo
-  var estadoEl = document.getElementById('estado-periodo');
-  estadoEl.innerHTML = abierto ?
-    '<span class="status-open">● Período Abierto</span>' :
-    '<span class="status-closed">🔒 Período Cerrado</span>';
-
-  // Alert
-  var alertEl = document.getElementById('notas-alert');
-  alertEl.innerHTML = abierto ? '' :
-    '<div class="alert alert-warning">⚠️ El período para Trimestre '+currentTrim+' está cerrado. Contacta al administrador para habilitar el ingreso de notas.</div>';
-
-  document.getElementById('notas-subtitulo').textContent =
-    'Trimestre '+currentTrim+' · '+currentCursoNombre+' · Nota mínima: 7.00';
-
-  // Cargar estudiantes del curso
-  var {data:ests, error:estErr} = await sb.from('estudiantes').select(
-    'id,profiles(nombres,apellidos)'
-  ).eq('curso_id',currentCursoId).order('id');
-
-  if(estErr||!ests||!ests.length){
-    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;padding:32px;color:var(--text3)">No hay estudiantes en este curso</td></tr>';
-    return;
-  }
-
-  // Cargar notas existentes
-  var {data:notas} = await sb.from('calificaciones').select('*')
-    .eq('docente_id',currentUser.id)
-    .eq('materia_id',currentMateriaId)
-    .eq('curso_id',currentCursoId)
-    .eq('trimestre',currentTrim);
-
-  // Indexar notas por estudiante_id
-  notasData = {};
-  (notas||[]).forEach(function(n){ notasData[n.estudiante_id]=n; });
-
-  // Totales de los OTROS trimestres (de esta materia y curso) para el estado anual
-  otrosTrim = {};
-  var rotros = await sb.from('calificaciones').select('estudiante_id,trimestre,total_parcial')
-    .eq('materia_id',currentMateriaId).eq('curso_id',currentCursoId);
-  (rotros.data||[]).forEach(function(n){
-    if(n.trimestre===currentTrim) return;
-    if(n.total_parcial===null||n.total_parcial===undefined) return;
-    var o = otrosTrim[n.estudiante_id] || (otrosTrim[n.estudiante_id]={sum:0,count:0});
-    o.sum += parseFloat(n.total_parcial); o.count += 1;
-  });
-
-  // Notas de supletorio ya guardadas (de esta materia y curso)
-  suplMap = {};
-  var rsup = await sb.from('supletorios').select('estudiante_id,nota')
-    .eq('materia_id',currentMateriaId).eq('curso_id',currentCursoId);
-  (rsup.data||[]).forEach(function(s){ suplMap[s.estudiante_id] = (s.nota===null?null:parseFloat(s.nota)); });
-
-  // Renderizar tabla
-  tbody.innerHTML = ests.map(function(e,i){
-    var p = e.profiles||{};
-    var n = notasData[e.id]||{};
-    var nombre = (p.apellidos||'')+' '+(p.nombres||'');
-    var disabled = abierto ? '' : 'disabled';
-
-    var i1=n.insumo1||'', i2=n.insumo2||'', i3=n.insumo3||'', i4=n.insumo4||'', pr=n.prueba||'';
-    var total = n.total_parcial;
-
-    var totalHtml;
-    if(total===null||total===undefined||total===''){
-      totalHtml = '<span class="total-empty">—</span>';
-    } else {
-      var t = parseFloat(total);
-      var cls = t>=7?'total-pass':t>=5?'total-sup':'total-fail';
-      totalHtml = '<span class="'+cls+'">'+t.toFixed(2)+'</span>';
-    }
-
-    var estadoBadge = estadoAnual(e.id, (total===null||total===undefined||total==='')?null:parseFloat(total));
-    var promR = promAnualNum(e.id, (total===null||total===undefined||total==='')?null:parseFloat(total));
-    var suplCell = (promR!==null && promR<7)
-      ? '<input class="grade-input" type="number" min="0" max="10" step="0.01" value="'+(suplMap[e.id]!=null?suplMap[e.id]:'')+'" onchange="guardarSuplDoc(\''+e.id+'\')" id="supl-in-'+e.id+'" style="border-color:rgba(217,119,6,.45)"/>'
-      : '<span class="total-empty">—</span>';
-
-    var promAnualHtml = (promR!==null) ? promR.toFixed(2) : '<span class="total-empty">—</span>';
-    // Calcular promedio insumos y totales para mostrar
-    var promIns='', totN='', totP='';
-    if(i1!==''&&i2!==''&&i3!==''&&i4!==''){
-      var prom = (parseFloat(i1)+parseFloat(i2)+parseFloat(i3)+parseFloat(i4))/4;
-      promIns = prom.toFixed(2);
-      totN = (prom*0.8).toFixed(2);
-    }
-    if(pr!==''){
-      totP = (parseFloat(pr)*0.2).toFixed(2);
-    }
-
-    return '<tr id="row-'+e.id+'">'+
-      '<td style="color:var(--text3);font-size:.72rem">'+(i+1)+'</td>'+
-      '<td><div style="font-weight:500;font-size:.82rem">'+nombre+'</div></td>'+
-      '<td><input class="grade-input" type="number" min="0" max="10" step="0.01" value="'+i1+'" '+disabled+
-        ' onchange="calcRow(\''+e.id+'\')" oninput="calcRow(\''+e.id+'\')" id="i1-'+e.id+'"/></td>'+
-      '<td><input class="grade-input" type="number" min="0" max="10" step="0.01" value="'+i2+'" '+disabled+
-        ' onchange="calcRow(\''+e.id+'\')" oninput="calcRow(\''+e.id+'\')" id="i2-'+e.id+'"/></td>'+
-      '<td><input class="grade-input" type="number" min="0" max="10" step="0.01" value="'+i3+'" '+disabled+
-        ' onchange="calcRow(\''+e.id+'\')" oninput="calcRow(\''+e.id+'\')" id="i3-'+e.id+'"/></td>'+
-      '<td><input class="grade-input" type="number" min="0" max="10" step="0.01" value="'+i4+'" '+disabled+
-        ' onchange="calcRow(\''+e.id+'\')" oninput="calcRow(\''+e.id+'\')" id="i4-'+e.id+'"/></td>'+
-      '<td><input class="grade-input" type="number" min="0" max="10" step="0.01" value="'+pr+'" '+disabled+
-        ' onchange="calcRow(\''+e.id+'\')" oninput="calcRow(\''+e.id+'\')" id="pr-'+e.id+'" style="border-color:rgba(155,22,38,.3)"/></td>'+
-      '<td id="prom-'+e.id+'" style="font-size:.78rem;color:var(--text3)">'+promIns+'</td>'+
-      '<td id="tn-'+e.id+'" style="font-size:.78rem;color:var(--text3)">'+totN+'</td>'+
-      '<td id="tp-'+e.id+'" style="font-size:.78rem;color:var(--text3)">'+totP+'</td>'+
-      '<td id="total-'+e.id+'">'+totalHtml+'</td>'+
-      '<td id="proman-'+e.id+'" style="font-weight:700;font-family:\'Cinzel\',serif;color:var(--text)">'+promAnualHtml+'</td>'+
-      '<td id="est-'+e.id+'">'+estadoBadge+'</td>'+
-      '<td id="supl-'+e.id+'" style="background:rgba(217,119,6,.04)">'+suplCell+'</td>'+
-      '</tr>';
-  }).join('');
-
-  document.getElementById('btn-guardar').disabled = !abierto;
-}
-
-// Promedio de los TRES trimestres (numérico) incluyendo el trimestre que se edita
-function promAnualNum(estId, totalActual){
-  var o = otrosTrim[estId] || {sum:0,count:0};
-  var sum = o.sum, count = o.count;
-  if(totalActual!==null && totalActual!==undefined && !isNaN(totalActual)){ sum += totalActual; count += 1; }
-  return count ? sum/count : null;
-}
-// Veredicto: usa el promedio anual y, si hay supletorio rendido, la nota del supletorio
-function veredictoBadge(prom, supl){
-  if(prom===null) return '<span class="badge badge-gray">Sin nota</span>';
-  if(prom>=7) return '<span class="badge badge-green">Aprobado</span>';
-  if(supl===null||supl===undefined||isNaN(supl)) return '<span class="badge badge-orange">Supletorio</span>';
-  if(supl>=7) return '<span class="badge badge-green">Aprob. x supl.</span>';
-  return '<span class="badge badge-red">No aprobado</span>';
-}
-function estadoAnual(estId, totalActual){
-  return veredictoBadge(promAnualNum(estId, totalActual), suplMap[estId]);
-}
-
-// Guarda/borra la nota de supletorio (tabla supletorios). No toca calificaciones.
-async function guardarSuplDoc(estId){
-  var el = document.getElementById('supl-in-'+estId);
-  if(!el) return;
-  var txt = (el.value||'').trim().replace(',','.');
-  el.style.borderColor = 'rgba(217,119,6,.4)';
-  try{
-    if(txt===''){
-      suplMap[estId] = null;
-      await sb.from('supletorios').delete().eq('estudiante_id',Number(estId)).eq('materia_id',currentMateriaId);
-    } else {
-      var n = parseFloat(txt);
-      if(isNaN(n)||n<0||n>10){ el.style.borderColor='var(--red)'; alert('La nota de supletorio debe ser un número entre 0 y 10'); return; }
-      suplMap[estId] = n;
-      var r = await sb.from('supletorios').upsert(
-        {estudiante_id:Number(estId), materia_id:currentMateriaId, curso_id:currentCursoId, nota:n, updated_at:new Date().toISOString()},
-        {onConflict:'estudiante_id,materia_id'});
-      if(r.error) throw r.error;
-    }
-    el.style.borderColor = 'var(--green)';
-    calcRow(estId); // refresca el badge de estado con la nueva nota
-  }catch(e){ el.style.borderColor='var(--red)'; alert('No se pudo guardar el supletorio: '+(e.message||e)); }
-}
-
-// ─── CALCULAR FILA EN TIEMPO REAL ───
-function calcRow(estId){
-  var g = function(id){ var el=document.getElementById(id); return el&&el.value!==''?parseFloat(el.value):null; };
-  var i1=g('i1-'+estId), i2=g('i2-'+estId), i3=g('i3-'+estId), i4=g('i4-'+estId), pr=g('pr-'+estId);
-
-  // Validar rango
-  [i1,i2,i3,i4,pr].forEach(function(v,idx){
-    var ids=['i1-','i2-','i3-','i4-','pr-'];
-    var el=document.getElementById(ids[idx]+estId);
-    if(!el) return;
-    if(v!==null&&(v<0||v>10)) el.classList.add('error');
-    else el.classList.remove('error');
-  });
-
-  var promEl=document.getElementById('prom-'+estId);
-  var tnEl=document.getElementById('tn-'+estId);
-  var tpEl=document.getElementById('tp-'+estId);
-  var totalEl=document.getElementById('total-'+estId);
-  var estEl=document.getElementById('est-'+estId);
-  var promanEl=document.getElementById('proman-'+estId);
-
-  if(i1!==null&&i2!==null&&i3!==null&&i4!==null){
-    var prom=(i1+i2+i3+i4)/4;
-    var tn=prom*0.8;
-    promEl.textContent=prom.toFixed(2);
-    tnEl.textContent=tn.toFixed(2);
-
-    if(pr!==null){
-      var tp=pr*0.2;
-      var total=tn+tp;
-      tpEl.textContent=tp.toFixed(2);
-      var cls=total>=7?'total-pass':total>=5?'total-sup':'total-fail';
-      totalEl.innerHTML='<span class="'+cls+'">'+total.toFixed(2)+'</span>';
-      estEl.innerHTML=estadoAnual(estId, total);
-      if(promanEl){ var pa=promAnualNum(estId,total); promanEl.textContent = pa!==null?pa.toFixed(2):'—'; }
-    }
-  } else {
-    promEl.textContent=''; tnEl.textContent='';
-    if(estEl) estEl.innerHTML=estadoAnual(estId, null);
-    if(promanEl){ var pa2=promAnualNum(estId,null); promanEl.textContent = pa2!==null?pa2.toFixed(2):'—'; }
-    if(pr!==null&&pr!==undefined){
-      tpEl.textContent=(pr*0.2).toFixed(2);
-    }
-  }
-}
-
-// ─── GUARDAR TODO ───
-async function guardarTodo(){
-  var btn=document.getElementById('btn-guardar');
-  var msg=document.getElementById('save-msg');
-  btn.disabled=true; btn.textContent='⏳ Guardando...';
-  msg.className='save-msg'; msg.textContent='Guardando notas...';
-
-  // Obtener todos los estudiantes de la tabla
-  var rows=document.querySelectorAll('#notas-tbody tr[id^="row-"]');
-  var errores=0; var guardados=0;
-
-  for(var i=0;i<rows.length;i++){
-    var row=rows[i];
-    var estId=row.id.replace('row-','');
-    var g=function(pfx){ var el=document.getElementById(pfx+estId); return el&&el.value!==''?parseFloat(el.value):null; };
-    var i1=g('i1-'), i2=g('i2-'), i3=g('i3-'), i4=g('i4-'), pr=g('pr-');
-
-    // Solo guardar si hay algún dato
-    if(i1===null&&i2===null&&i3===null&&i4===null&&pr===null) continue;
-
-    // Validar rango
-    var vals=[i1,i2,i3,i4,pr].filter(function(v){return v!==null;});
-    var invalid=vals.some(function(v){return v<0||v>10;});
-    if(invalid){ errores++; continue; }
-
-    var payload={
-      estudiante_id: parseInt(estId),
-      materia_id: currentMateriaId,
-      curso_id: currentCursoId,
-      docente_id: currentUser.id,
-      trimestre: currentTrim,
-      insumo1: i1, insumo2: i2, insumo3: i3, insumo4: i4,
-      prueba: pr
-    };
-
-    var {error}=await sb.from('calificaciones').upsert(payload,{
-      onConflict:'estudiante_id,materia_id,trimestre'
-    });
-
-    if(error){ errores++; } else { guardados++; }
-  }
-
-  btn.disabled=false; btn.textContent='💾 Guardar Todo';
-  if(errores>0){
-    msg.className='save-msg err'; msg.textContent='⚠️ '+errores+' error(es). Verifica que las notas estén entre 0 y 10.';
-  } else {
-    msg.className='save-msg ok'; msg.textContent='✅ '+guardados+' registros guardados correctamente';
-    setTimeout(function(){ msg.className='save-msg'; msg.textContent='Los cambios se guardan automáticamente'; },4000);
-  }
-  // Recargar para mostrar totales calculados
-  await cargarNotas();
-}
-
-// ─── SIDEBAR MÓVIL ───
-function toggleSidebar(){
-  var sb=document.getElementById('sidebar');
-  var ov=document.getElementById('sidebar-overlay');
-  var isOpen=sb.classList.toggle('open');
-  ov.classList.toggle('open',isOpen);
-  document.body.style.overflow=isOpen&&window.innerWidth<768?'hidden':'';
-}
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebar-overlay').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-// Cerrar sidebar al navegar en móvil
-function showSection(id, el){
-  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
-  var sec=document.getElementById('sec-'+id);
-  if(sec) sec.classList.add('active');
-  if(el){
-    document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
-    el.classList.add('active');
-  }
-  if(window.innerWidth<768) closeSidebar();
-}
-
-// ─── PDF EXPORT ───
-function exportarPDF(){
-  if(typeof window.jspdf==='undefined') return;
-  var {jsPDF}=window.jspdf;
-  var doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  doc.setFillColor(26,26,46); doc.rect(0,0,297,22,'F');
-  doc.setTextColor(240,201,106); doc.setFont('helvetica','bold'); doc.setFontSize(12);
-  doc.text('COLEGIO PARTICULAR MIXTO "CHARLES BABBAGE"',148,9,{align:'center'});
-  doc.setFontSize(8); doc.setTextColor(200,180,120);
-  doc.text(currentMateriaNombre+' — '+currentCursoNombre+' — Trimestre '+currentTrim,148,16,{align:'center'});
-
-  var rows=[];
-  document.querySelectorAll('#notas-tbody tr[id^="row-"]').forEach(function(tr,i){
-    var cells=tr.querySelectorAll('td');
-    var nombre=cells[1].textContent.trim();
-    var g=function(idx){var el=cells[idx].querySelector('input'); return el?el.value||'—':'—';};
-    var total=cells[10].textContent.trim();
-    var estado=cells[11].textContent.trim();
-    rows.push([i+1,nombre,g(2),g(3),g(4),g(5),g(6),cells[7].textContent.trim(),cells[8].textContent.trim(),cells[9].textContent.trim(),total,estado]);
-  });
-
-  doc.autoTable({
-    startY:26,
-    head:[['#','Estudiante','I1','I2','I3','I4','Prueba','Prom.Ins','T.Notas','T.Prueba','Total','Estado']],
-    body:rows,
-    styles:{fontSize:7,cellPadding:2.5},
-    headStyles:{fillColor:[155,22,38],textColor:255,fontStyle:'bold',halign:'center'},
-    bodyStyles:{textColor:[26,26,46]},
-    alternateRowStyles:{fillColor:[247,246,243]},
-    columnStyles:{0:{halign:'center',cellWidth:7},2:{halign:'center'},3:{halign:'center'},4:{halign:'center'},5:{halign:'center'},6:{halign:'center'},7:{halign:'center'},8:{halign:'center'},9:{halign:'center'},10:{halign:'center',fontStyle:'bold'},11:{halign:'center'}},
-    foot:[['','','','','','','Fórmula: (Prom.Insumos × 0.80) + (Prueba × 0.20) = Total  |  Aprobado ≥ 7.00','','','','','']],
-    footStyles:{fillColor:[240,230,210],textColor:[100,80,40],fontSize:6}
-  });
-
-  var ph=doc.internal.pageSize.height;
-  doc.setFontSize(6); doc.setTextColor(160,150,140);
-  doc.text('Generado: '+new Date().toLocaleString('es-EC')+'  |  Sistema Académico Charles Babbage',148,ph-4,{align:'center'});
-  doc.save('notas_'+currentMateriaNombre.replace(/ /g,'_')+'_'+currentCursoNombre.replace(/ /g,'_')+'_T'+currentTrim+'.pdf');
-}
-</script>
 </body>
 </html>
