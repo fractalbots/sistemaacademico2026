@@ -1,11 +1,168 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta http-equiv="refresh" content="0; url=login.html"/>
-<title>Sistema Académico — Charles Babbage</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema temporalmente suspendido</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background:
+        radial-gradient(circle at top, #192c45, #080d18 65%);
+    color: #fff;
+    padding: 20px;
+}
+
+.container {
+    max-width: 650px;
+    width: 100%;
+    text-align: center;
+    padding: 55px 35px;
+    background: rgba(16, 27, 44, 0.92);
+    border: 1px solid #263b55;
+    border-radius: 18px;
+    box-shadow: 0 20px 70px rgba(0,0,0,.5);
+}
+
+.icon {
+    font-size: 65px;
+    margin-bottom: 25px;
+}
+
+.status {
+    display: inline-block;
+    padding: 8px 18px;
+    background: rgba(239, 68, 68, .13);
+    border: 1px solid #ef4444;
+    color: #ff6464;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: clamp(27px, 5vw, 38px);
+    margin-bottom: 18px;
+    line-height: 1.2;
+}
+
+h1 span {
+    color: #f59e0b;
+}
+
+.description {
+    color: #aab7c8;
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.divider {
+    height: 1px;
+    background: #29394e;
+    margin: 30px 0;
+}
+
+.warning {
+    background: rgba(245, 158, 11, .08);
+    border-left: 3px solid #f59e0b;
+    padding: 18px;
+    text-align: left;
+    color: #d5deea;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+.contact {
+    display: inline-block;
+    text-decoration: none;
+    background: #f59e0b;
+    color: #111827;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.contact:hover {
+    background: #fbbf24;
+    transform: translateY(-3px);
+}
+
+.footer {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 35px;
+    line-height: 1.8;
+}
+
+</style>
 </head>
+
 <body>
-<script>window.location.replace('login.html');</script>
+
+<div class="container">
+
+    <div class="icon">⚠️</div>
+
+    <div class="status">
+        SERVICIO TEMPORALMENTE SUSPENDIDO
+    </div>
+
+    <h1>
+        Sistema <span>Fuera de Servicio</span>
+    </h1>
+
+    <p class="description">
+        Actualmente, esta plataforma se encuentra
+        temporalmente inhabilitada debido a la falta
+        de renovación de los servicios de infraestructura
+        tecnológica.
+    </p>
+
+    <div class="warning">
+        <strong>Motivo de la suspensión:</strong><br>
+        • Renovación pendiente del servicio de base de datos Supabase.<br>
+        • Renovación pendiente del dominio web.<br><br>
+        El acceso al sistema será restablecido una vez
+        regularizados los servicios correspondientes.
+    </div>
+
+    <p class="description">
+        Para obtener información sobre la reactivación
+        de la plataforma, comuníquese directamente
+        con el administrador del sistema.
+    </p>
+
+    <a class="contact"
+       href="mailto:administrador@tudominio.com?subject=Solicitud%20de%20reactivacion">
+        CONTACTAR AL ADMINISTRADOR
+    </a>
+
+    <div class="divider"></div>
+
+    <div class="footer">
+        SISTEMA DE INFORMACIÓN<br>
+        Aviso de mantenimiento administrativo e infraestructura.<br>
+        © 2026 - Todos los derechos reservados.
+    </div>
+
+</div>
+
 </body>
 </html>
